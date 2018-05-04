@@ -24,8 +24,8 @@ namespace isometric_1.Helpers {
             }
         }
 
-        public static string GetFilePath (string fileName) {
-            var path = Path.Combine (BasePath, "resources", fileName);
+        public static string GetFilePath (string catalog, string fileName) {
+            var path = Path.Combine (BasePath, "resources", catalog, fileName);
 
             if (!File.Exists (path)) {
                 throw new FileNotFoundException (fileName);
@@ -34,10 +34,10 @@ namespace isometric_1.Helpers {
             return path;
         }
 
-        public static IntPtr LoadFontFromTTF(string path, int size) {
-            var font = SDL_ttf.TTF_OpenFont(path, size);
+        public static IntPtr LoadFontFromTTF (string path, int size) {
+            var font = SDL_ttf.TTF_OpenFont (path, size);
 
-            Fonts.Add(path, font);
+            Fonts.Add (path, font);
 
             return font;
         }
@@ -56,7 +56,7 @@ namespace isometric_1.Helpers {
                     format = ((SDL.SDL_Surface * ) (image.ToPointer ())) -> format;
                 }
 
-                SDL.SDL_SetColorKey (image, (int)SDL.SDL_bool.SDL_TRUE, SDL.SDL_MapRGB(format, 255, 0, 255));
+                SDL.SDL_SetColorKey (image, (int) SDL.SDL_bool.SDL_TRUE, SDL.SDL_MapRGB (format, 255, 0, 255));
 
                 texture = SDL.SDL_CreateTextureFromSurface (renderer, image);
                 SDL.SDL_FreeSurface (image);
@@ -85,25 +85,23 @@ namespace isometric_1.Helpers {
             return texture;
         }
 
-        public static IntPtr CreateTextureFromText(string text, IntPtr renderer, IntPtr font, SDL.SDL_Color color) {
+        public static IntPtr CreateTextureFromText (string text, IntPtr renderer, IntPtr font, SDL.SDL_Color color) {
 
-            var surface = SDL_ttf.TTF_RenderUTF8_Solid(font, text, color);
-            
-            if(surface == IntPtr.Zero)
-            {
-                throw new SdlException(nameof(SDL_ttf.TTF_RenderUTF8_Solid));
-            }
-            
-            var texture = SDL.SDL_CreateTextureFromSurface(renderer, surface);
+            var surface = SDL_ttf.TTF_RenderUTF8_Solid (font, text, color);
 
-            if(texture == IntPtr.Zero)
-            {
-                throw new SdlException(nameof(SDL.SDL_CreateTextureFromSurface));
+            if (surface == IntPtr.Zero) {
+                throw new SdlException (nameof (SDL_ttf.TTF_RenderUTF8_Solid));
             }
 
-            Textures.Add(texture);
+            var texture = SDL.SDL_CreateTextureFromSurface (renderer, surface);
 
-            SDL.SDL_FreeSurface(surface);
+            if (texture == IntPtr.Zero) {
+                throw new SdlException (nameof (SDL.SDL_CreateTextureFromSurface));
+            }
+
+            Textures.Add (texture);
+
+            SDL.SDL_FreeSurface (surface);
 
             return texture;
         }

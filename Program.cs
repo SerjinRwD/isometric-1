@@ -9,8 +9,6 @@
     class Program {
         private static IntPtr _renderer;
         private static IntPtr _window;
-        private static string _fontPath = Resources.GetFilePath ("fonts/DejaVuSansMono.ttf");
-        private static IntPtr _font;
         private static bool _quit;
         private static SDL.SDL_Rect _display;
 
@@ -52,17 +50,15 @@
             if (_renderer == IntPtr.Zero) {
                 throw new SdlException (nameof (SDL.SDL_CreateRenderer));
             }
-
-            _font = SDL_ttf.TTF_OpenFont (_fontPath, 14);
         }
 
         private static void Run () {
 
             var emitter = new SdlEventEmitter ();
 
-            var font = Resources.LoadFontFromTTF (Resources.GetFilePath (@"fonts\DejaVuSansMono.ttf"), 8);
+            var font = Resources.LoadFontFromTTF (Resources.GetFilePath (@"fonts", "DejaVuSansMono.ttf"), 8);
 
-            var texture = Resources.LoadTextureFromBitmap (Resources.GetFilePath (@"images\demo.bmp"), _renderer);
+            var texture = Resources.LoadTextureFromBitmap (Resources.GetFilePath (@"images", "demo.bmp"), _renderer);
 
             var floors = new Tile[] {
                 new Tile {
@@ -202,9 +198,6 @@
         }
 
         private static void Quit () {
-            if (!(_font == IntPtr.Zero)) {
-                SDL_ttf.TTF_CloseFont (_font);
-            }
 
             if (!(_renderer == IntPtr.Zero)) {
                 SDL.SDL_DestroyRenderer (_renderer);
