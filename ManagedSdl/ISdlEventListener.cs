@@ -1,6 +1,5 @@
-namespace isometric_1.Contract {
+namespace isometric_1.ManagedSdl {
     using System;
-    using isometric_1.Scene;
     using SDL2;
 
     public interface ISdlEventListener {

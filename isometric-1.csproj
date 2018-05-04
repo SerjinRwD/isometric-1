@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\SDL2-CS\SDL2-CS.Core.csproj" />
+    <ProjectReference Include="../SDL2-CS/SDL2-CS.Core.csproj" />
   </ItemGroup>
   
   <ItemGroup>
@@ -10,6 +10,10 @@
   
   <ItemGroup>
       <None Include="resources/images/demo.bmp" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  
+  <ItemGroup>
+      <None Include="resources/tilesets/demo.xml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <PropertyGroup>

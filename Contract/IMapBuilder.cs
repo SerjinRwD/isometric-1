@@ -6,6 +6,6 @@ namespace isometric_1.Contract
 
     public interface IMapBuilder
     {
-        MapCell[,] Build(Size2d mapSize, SceneContext context);
+        MapTile[,] Build(Size2d mapSize, SceneContext context);
     }
 }

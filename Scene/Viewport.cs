@@ -2,6 +2,7 @@ namespace isometric_1.Scene {
     using System.Collections.Generic;
     using System;
     using isometric_1.Contract;
+    using isometric_1.ManagedSdl;
     using isometric_1.Types;
     using SDL2;
 
@@ -18,7 +19,7 @@ namespace isometric_1.Scene {
         private int _precalculatedCellLengthHalf;
         private int _precalculatedCellLengthQuarter;
 
-        private Point2d _prevIsoTile = new Point2d(0, 0);
+        private Point2d _prevIsoTile = new Point2d (0, 0);
 
         private static Dictionary<Direction, Action<Viewport>> _handling = new Dictionary<Direction, Action<Viewport>> { // Я ленивый и терпеть не могу switch-конструкцию
             { Direction.Right, v => v.Position += (5, 0) },

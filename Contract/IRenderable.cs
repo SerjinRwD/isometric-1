@@ -1,7 +1,8 @@
 namespace isometric_1.Contract {
     using System;
+    using ManagedSdl;
 
     public interface IRenderable {
-        void Render (IntPtr renderer);
+        void Render (SdlRenderer renderer);
     }
 }

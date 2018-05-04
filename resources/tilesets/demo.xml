@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<ImageTileSetMetadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Name>Demo</Name>
+  <Description>Пробный тайлсет</Description>
+  <BitmapFile>demo.bmp</BitmapFile>
+  <Floors>
+    <ImageTile OrderId="1" OffsetX="0" OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="0" OffsetX="0" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
+  </Floors>
+  <Blocks>
+    <ImageTile OrderId="0" OffsetX="54" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="13" />
+  </Blocks>
+  <Decorations>
+    <ImageTile OrderId="0" OffsetX="108" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="1" OffsetX="108" OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
+  </Decorations>
+  <UserInterface>
+    <ImageTile OrderId="0" OffsetX="162" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
+  </UserInterface>
+</ImageTileSetMetadata>

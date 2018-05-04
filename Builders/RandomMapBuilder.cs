@@ -5,7 +5,7 @@ namespace isometric_1.Builders {
     using isometric_1.Types;
 
     public class RandomMapBuilder : IMapBuilder {
-        public MapCell[, ] Build (Size2d mapSize, SceneContext context) {
+        public MapTile[, ] Build (Size2d mapSize, SceneContext context) {
             throw new NotImplementedException ();
         }
     }

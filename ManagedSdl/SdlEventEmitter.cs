@@ -1,6 +1,5 @@
-namespace isometric_1.Scene {
+namespace isometric_1.ManagedSdl {
     using System;
-    using isometric_1.Contract;
     using SDL2;
 
     public class SdlKeyboardEventArgs : EventArgs {

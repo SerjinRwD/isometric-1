@@ -6,13 +6,13 @@ namespace isometric_1.Scene {
         public Size3d CellSize { get; private set; }
         public Size2d DisplaySize { get; private set; }
         public Viewport Viewport { get; private set; }
-        public TileSet TileSet { get; private set; }
+        public ImageTileSet TileSet { get; private set; }
         public Map Map { get; private set; }
 
         public SceneContext (Size3d cellSize,
             Size2d mapSize,
             Size2d displaySize,
-            TileSet tileSet,
+            ImageTileSet tileSet,
             IMapBuilder builder) {
 
             CellSize = cellSize;

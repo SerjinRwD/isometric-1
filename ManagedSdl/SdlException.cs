@@ -1,4 +1,4 @@
-namespace isometric_1 {
+namespace isometric_1.ManagedSdl {
     using System;
     using SDL2;
     
