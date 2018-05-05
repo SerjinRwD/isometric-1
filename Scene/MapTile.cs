@@ -5,29 +5,42 @@ namespace isometric_1.Scene {
     using isometric_1.Helpers;
     using isometric_1.Types;
 
+    public enum MapTileOrientation {
+        XY,
+        ZY
+    }
+    public enum MapTileType {
+        Floor,
+        Wall,
+        Ramp
+    }
+
     public class MapTile {
         public Point3d IsometricPosition { get; private set; }
-        public int Column { get; private set; }
-        public int Row { get; private set; }
-        public int Height { get; private set; }
-        public bool IsBlocked { get; private set; }
+        public Point3d MapPosition { get; private set; }
+        public MapTileType Type { get; private set; }
+        public MapTileOrientation Orientation { get; private set; }
+        public AbstractActor Visitor { get; set; }
+        public bool IsEmpty { get => Type != MapTileType.Wall && Visitor == null; }
         public bool IsSelected { get; set; }
         public int FloorId { get; private set; }
         public int BlockId { get; private set; }
         public int[] DecorationIds { get; private set; }
         public object Tag { get; set; }
 
-        public MapTile (SceneContext context,
-            int column, int row, int height, bool isBlocked,
-            int floorId = ImageTileSet.NOT_SET, int blockId = ImageTileSet.NOT_SET, int[] decorationIds = null) {
+        public MapTile (
+            Point3d mapPosition,
+            Size3d cellSize,
+            MapTileType type,
+            MapTileOrientation orientation = MapTileOrientation.ZY,
+            int floorId = ImageTile.NOT_SET,
+            int blockId = ImageTile.NOT_SET,
+            int[] decorationIds = null) {
 
-            Column = column;
-            Row = row;
-            Height = height;
-            IsometricPosition = Point3d.CalcIsometric (
-                new Point3d (column, height, row),
-                context.CellSize);
-            IsBlocked = isBlocked;
+            MapPosition = mapPosition;
+            IsometricPosition = Point3d.CalcIsometric (mapPosition, cellSize);
+            Type = type;
+            Orientation = orientation;
             IsSelected = false;
 
             FloorId = floorId;

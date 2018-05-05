@@ -10,8 +10,7 @@ namespace isometric_1.Scene {
         public SceneContext Context { get; private set; }
         public Point2d Position { get; private set; }
         public Point2d BottomRight { get; private set; }
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        public Size2d Size { get; private set; }
         public Direction Direction { get; private set; }
         public bool IsMove { get; private set; }
 
@@ -35,16 +34,15 @@ namespace isometric_1.Scene {
             { SDL.SDL_Keycode.SDLK_LEFT, Direction.Left }
         };
 
-        public Viewport (SceneContext context, int x, int y, int w, int h) {
+        public Viewport (SceneContext context, int x, int y, Size2d size) {
             Context = context;
             Position = new Point2d (x, y);
-            BottomRight = new Point2d (x + w, y + h);
-            Width = w;
-            Height = h;
+            BottomRight = new Point2d (x + size.width, y + size.height);
+            Size = size;
 
-            _precalculatedCellWidthHalf = Context.CellSize.width >> 1;
-            _precalculatedCellLengthHalf = Context.CellSize.length >> 1;
-            _precalculatedCellLengthQuarter = Context.CellSize.length >> 2;
+            _precalculatedCellWidthHalf = Context.Map.TileSize.width >> 1;
+            _precalculatedCellLengthHalf = Context.Map.TileSize.length >> 1;
+            _precalculatedCellLengthQuarter = Context.Map.TileSize.length >> 2;
         }
 
         public void OnKeyDown (object sender, SdlKeyboardEventArgs args) {
@@ -62,7 +60,7 @@ namespace isometric_1.Scene {
 
         public void OnMouseMotion (object sender, SdlMouseMotionEventArgs args) {
 
-            var cursorX = args.MouseMotionEvent.x + Position.x - (Context.DisplaySize.width >> 1);
+            var cursorX = args.MouseMotionEvent.x + Position.x - (Size.width >> 1);
             var cursorY = args.MouseMotionEvent.y + Position.y;
 
             var isoTileX = cursorX / _precalculatedCellWidthHalf * _precalculatedCellWidthHalf;
@@ -93,7 +91,7 @@ namespace isometric_1.Scene {
 
             _handling[Direction]?.Invoke (this);
 
-            BottomRight = new Point2d (Position.x + Width, Position.y + Height);
+            BottomRight = new Point2d (Position.x + Size.width, Position.y + Size.height);
         }
     }
 }

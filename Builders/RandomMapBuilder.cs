@@ -4,8 +4,10 @@ namespace isometric_1.Builders {
     using isometric_1.Scene;
     using isometric_1.Types;
 
-    public class RandomMapBuilder : IMapBuilder {
-        public MapTile[, ] Build (Size2d mapSize, SceneContext context) {
+    public class RandomMapBuilder : AbstractMapBuilder {
+        public RandomMapBuilder (MapTilePrototypeLibrary library) : base (library) { }
+        
+        public override MapTile[, ] Build (Size2d mapSize) {
             throw new NotImplementedException ();
         }
     }

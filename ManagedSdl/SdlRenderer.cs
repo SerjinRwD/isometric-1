@@ -1,5 +1,6 @@
 namespace isometric_1.ManagedSdl {
     using System;
+    using isometric_1.Types;
     using SDL2;
 
     public class SdlRenderer : IDisposable {
@@ -72,6 +73,11 @@ namespace isometric_1.ManagedSdl {
         public void SetDrawColor (byte r, byte g, byte b, byte a) {
             SDL.SDL_SetRenderDrawColor (Pointer, r, g, b, a);
         }
+
+        public void SetDrawColor (byte r, byte g, byte b) {
+            SetDrawColor (r, g, b, 255);
+        }
+
         public static SdlRenderer Create(SdlWindow window, int index, SDL.SDL_RendererFlags flags)
         {
             var rendererPtr = SDL.SDL_CreateRenderer(window.Pointer, index, flags);
@@ -79,6 +85,19 @@ namespace isometric_1.ManagedSdl {
             return new SdlRenderer {
                 Pointer = rendererPtr
             };
+        }
+
+        public void DrawPoint(int x, int y)
+        {
+            SDL.SDL_RenderDrawPoint(Pointer, x, y);
+        }
+        public void DrawPoint(Point2d point)
+        {
+            SDL.SDL_RenderDrawPoint(Pointer, point.x, point.y);
+        }
+        public void DrawPoint(Point3d point)
+        {
+            DrawPoint(point.ToPoint2d());
         }
     }
 }

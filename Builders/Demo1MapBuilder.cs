@@ -1,28 +1,34 @@
 namespace isometric_1.Builders {
     using System;
+
     using isometric_1.Contract;
     using isometric_1.Scene;
     using isometric_1.Types;
 
-    public class Demo1MapBuilder : IMapBuilder {
-        public MapTile[, ] Build (Size2d mapSize, SceneContext context) {
-            var _cells = new MapTile[mapSize.width, mapSize.height];
+    public class Demo1MapBuilder : AbstractMapBuilder {
+        public Demo1MapBuilder (MapTilePrototypeLibrary library) : base (library) { }
 
-            var t1floorId = 0;
-            var t1decorations = new int[] { 0 };
-
-            var t2floorId = 1;
-            var t2decorations = new int[] { 1 };
+        public override MapTile[, ] Build (Size2d mapSize) {
+            var tiles = new MapTile[mapSize.width, mapSize.height];
+            var rnd = new Random();
 
             for (var i = 0; i < mapSize.width; i++) {
                 for (var j = 0; j < mapSize.height; j++) {
-                    _cells[i, j] = (i + j) % 2 == 0 ?
-                        new MapTile (context, i, j, 0, false, floorId: t1floorId, decorationIds: t1decorations) :
-                        new MapTile (context, i, j, 0, false, floorId: t2floorId, decorationIds: t2decorations);
+                    var n = rnd.Next(1, 100);
+
+                    if(n < 51) {
+                        tiles[i, j] = Library.HashedTiles["field"].Create (new Point3d (i, 0, j));
+                    } else if(n < 71) {
+                        tiles[i, j] = Library.HashedTiles["field-w-tree-1"].Create (new Point3d (i, 0, j));
+                    } else if(n < 72) {
+                        tiles[i, j] = Library.HashedTiles["field-w-corpse-1"].Create (new Point3d (i, 0, j));
+                    } else {
+                        tiles[i, j] = Library.HashedTiles["field"].Create (new Point3d (i, 0, j));
+                    }
                 }
             }
 
-            return _cells;
+            return tiles;
         }
     }
 }

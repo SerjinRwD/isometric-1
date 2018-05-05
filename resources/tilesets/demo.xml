@@ -3,18 +3,11 @@
   <Name>Demo</Name>
   <Description>Пробный тайлсет</Description>
   <BitmapFile>demo.bmp</BitmapFile>
-  <Floors>
-    <ImageTile OrderId="1" OffsetX="0" OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
+  <Tiles>
     <ImageTile OrderId="0" OffsetX="0" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
-  </Floors>
-  <Blocks>
-    <ImageTile OrderId="0" OffsetX="54" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="13" />
-  </Blocks>
-  <Decorations>
-    <ImageTile OrderId="0" OffsetX="108" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
-    <ImageTile OrderId="1" OffsetX="108" OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
-  </Decorations>
-  <UserInterface>
-    <ImageTile OrderId="0" OffsetX="162" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
-  </UserInterface>
+    <ImageTile OrderId="1" OffsetX="0" OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="2" OffsetX="54" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="13" />
+    <ImageTile OrderId="3" OffsetX="108" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="4" OffsetX="108" OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
+  </Tiles>
 </ImageTileSetMetadata>

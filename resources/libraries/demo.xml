@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<MapTilePrototypeLibrary xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Name>Demo map tiles library</Name>
+  <ImageTileSetFile>demo.xml</ImageTileSetFile>
+  <TileSize width="52" length="52" height="27" />
+  <Tiles>
+    <MapTilePrototype Name="field" Type="Floor" Orientation="XY" FloorId="0" BlockId="-1" />
+    <MapTilePrototype Name="field-w-tree-1" Type="Wall" Orientation="XY" FloorId="0" BlockId="-1" DecorationIds="3" />
+    <MapTilePrototype Name="field-w-corpse-1" Type="Floor" Orientation="XY" FloorId="0" BlockId="-1" DecorationIds="4" />
+  </Tiles>
+</MapTilePrototypeLibrary>

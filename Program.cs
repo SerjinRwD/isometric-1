@@ -1,10 +1,12 @@
 ﻿namespace isometric_1 {
     using System;
+
     using isometric_1.Builders;
     using isometric_1.Helpers;
     using isometric_1.ManagedSdl;
     using isometric_1.Scene;
     using isometric_1.Types;
+
     using SDL2;
 
     class Program {
@@ -18,7 +20,12 @@
             if (args != null && args.Length > 0) {
                 if (args[0] == "make-tileset-template") {
                     var result = MakeTileSetTemplate ();
-                    Console.WriteLine($"Template created: \"{result}\"");
+                    Console.WriteLine ($"Tileset template created: \"{result}\"");
+
+                    return;
+                } else if (args[0] == "make-library-template") {
+                    var result = MakeLibraryTemplate ();
+                    Console.WriteLine ($"Library template created: \"{result}\"");
 
                     return;
                 }
@@ -37,34 +44,48 @@
 
         private static string MakeTileSetTemplate () {
 
-            var floors = new ImageTile[] {
-                new ImageTile ()
-            };
-
-            var blocks = new ImageTile[] {
-                new ImageTile ()
-            };
-
-            var decorations = new ImageTile[] {
-                new ImageTile ()
-            };
-
-            var ui = new ImageTile[] {
-                new ImageTile ()
-            };
-
             var tileset = new ImageTileSetMetadata {
                 Name = "templateName",
-                Description =  "templateDescription",
+                Description = "templateDescription",
                 BitmapFile = "path/to/your/bitmap",
-                Floors = floors,
-                Blocks = blocks,
-                Decorations = decorations,
-                UserInterface = ui
+                Tiles = new ImageTile[] {
+                new ImageTile ()
+                }
             };
 
-            var outputPath = System.IO.Path.Combine(Resources.GetCatalogPath("tilesets"), "template.xml");
-            tileset.Save(outputPath);
+            var outputPath = System.IO.Path.Combine (Resources.GetCatalogPath ("tilesets"), "template.xml");
+            tileset.Save (outputPath);
+
+            return outputPath;
+        }
+
+        private static string MakeLibraryTemplate () {
+            var library = new MapTilePrototypeLibrary {
+                Name = "Template of Library",
+                ImageTileSetFile = "path/to/your/tileset",
+                TileSize = new Size3d (54, 54, 27),
+                Tiles = new MapTilePrototype[] {
+                    new MapTilePrototype {
+                        Name = "prototype1",
+                        Type = MapTileType.Floor,
+                        Orientation = MapTileOrientation.XY,
+                        FloorId = 0,
+                        BlockId = ImageTile.NOT_SET,
+                        DecorationIds = new int[] { 1, 2 }
+                    },
+                    new MapTilePrototype {
+                        Name = "prototype2",
+                        Type = MapTileType.Wall,
+                        Orientation = MapTileOrientation.XY,
+                        FloorId = ImageTile.NOT_SET,
+                        BlockId = 1,
+                        DecorationIds = null
+                    }
+                }
+            };
+
+            var outputPath = System.IO.Path.Combine (Resources.GetCatalogPath ("libraries"), "template.xml");
+            library.Save (outputPath);
 
             return outputPath;
         }
@@ -80,7 +101,7 @@
 
             SDL.SDL_GetDisplayBounds (0, out _display);
 
-            _window = SdlWindow.Create ("Isometrics 1", 0, 0, _display.w, _display.h, SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP); // .SDL_WINDOW_SHOWN);
+            _window = SdlWindow.Create ("Isometrics 1", 0, 0, _display.w, _display.h, SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP); // .SDL_WINDOW_SHOWN); //
 
             _renderer = SdlRenderer.Create (
                 _window, -1,
@@ -93,10 +114,11 @@
 
             var font = SdlFont.LoadFromTTF (Resources.GetFilePath (@"fonts", "DejaVuSansMono.ttf"), 8);
 
-            var tileset = ImageTileSet.Load(Resources.GetFilePath("tilesets", "demo.xml"), _renderer);
+            var tileset = ImageTileSet.Load (Resources.GetFilePath ("tilesets", "demo.xml"), _renderer);
+            var library = MapTilePrototypeLibrary.Load (Resources.GetFilePath ("libraries", "demo.xml"), _renderer);
 
             var context = new SceneContext (
-                new Size3d (54, 54, 27), new Size2d (3, 3), new Size2d (_display.w, _display.h), tileset, new PyramidMapBuilder ()); // new Demo1MapBuilder ()); // 
+                new Size2d (128, 128), new Size2d (_display.w, _display.h), tileset, new Demo1MapBuilder (library)); // new Demo1MapBuilder ()); // 
 
             emitter.Quit += (s, a) => _quit = true;
             emitter.MouseMotion += context.Viewport.OnMouseMotion;
@@ -116,7 +138,7 @@
                 _renderer.SetDrawColor (0, 0, 0, 255);
                 _renderer.Clear ();
 
-                context.Map.Render (_renderer);
+                context.Map.Render (_renderer, context.Viewport);
 
                 _renderer.Present ();
             }

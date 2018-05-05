@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<ImageTileSetMetadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Name>Global</Name>
+  <Description>Тайлсет глобального уровня: персонажи, UI</Description>
+  <BitmapFile>global.bmp</BitmapFile>
+  <Tiles>
+    <ImageTile OrderId="0" OffsetX="0" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="1" OffsetX="54" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
+  </Tiles>
+</ImageTileSetMetadata>

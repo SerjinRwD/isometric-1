@@ -7,23 +7,24 @@ namespace isometric_1.Scene {
     using ManagedSdl;
 
     public sealed class Map : IRenderable {
-        public SceneContext Context { get; private set; }
         public Size2d MapSize { get; private set; }
-        public MapTile[, ] Cells { get; private set; }
+        public Size3d TileSize { get; private set; }
+        public ImageTileSet TileSet { get; private set; }
+        public MapTile[, ] Tiles { get; private set; }
         public Dictionary<Point2d, MapTile> Hash { get; private set; }
 
-        public Map (Size2d mapSize, SceneContext context, IMapBuilder builder) {
-            Context = context;
+        public Map (Size2d mapSize, IMapBuilder builder) {
 
             MapSize = mapSize;
-
-            Cells = builder.Build (mapSize, context);
+            TileSet = builder.TileSet;
+            TileSize = builder.TileSize;
+            Tiles = builder.Build (mapSize);
 
             Hash = new Dictionary<Point2d, MapTile> ();
 
             for (var i = 0; i < MapSize.width; i++) {
                 for (var j = 0; j < MapSize.height; j++) {
-                    var cell = Cells[i, j];
+                    var cell = Tiles[i, j];
                     var key = new Point2d (
                         cell.IsometricPosition.x,
                         (cell.IsometricPosition.z - cell.IsometricPosition.y));
@@ -32,15 +33,15 @@ namespace isometric_1.Scene {
                         Hash[key] = cell;
                     } else {
                         Hash.Add (key, cell);
-                        Console.WriteLine ($"hash: {key}");
+                        //Console.WriteLine ($"hash: {key}");
                     }
                 }
             }
         }
 
-        public void Render (SdlRenderer renderer) {
+        public void Render (SdlRenderer renderer, Viewport viewport) {
 
-            if (Context.Viewport == null) {
+            if (viewport == null) {
                 throw new InvalidOperationException (@"Viewport is not set");
             }
 
@@ -52,66 +53,75 @@ namespace isometric_1.Scene {
             //*/
 
             /*
-            var fromX = Math.Max (0, Context.Viewport.Position.MapX);
-            var fromY = Math.Max (0, Context.Viewport.Position.MapY);
-            var toX = Math.Min (MapWidth - 1, Context.Viewport.BottomRight.MapX);
-            var toY = Math.Min (MapHeight - 1, Context.Viewport.BottomRight.MapY);
+            var fromX = Math.Max (0, viewport.Position.MapX);
+            var fromY = Math.Max (0, viewport.Position.MapY);
+            var toX = Math.Min (MapWidth - 1, viewport.BottomRight.MapX);
+            var toY = Math.Min (MapHeight - 1, viewport.BottomRight.MapY);
             //*/
 
             int i, j;
 
             for (i = fromX; i < toX; i++) {
                 for (j = fromY; j < toY; j++) {
-                    RenderMapCell (renderer, Cells[i, j]);
+                    RenderMapCell (renderer, Tiles[i, j], viewport);
                 }
             }
         }
 
-        public void RenderMapCell (SdlRenderer renderer, MapTile cell) {
-            ImageTile tile;
-            var texture = Context.TileSet.Texture;
-            int resultIsoX = cell.IsometricPosition.x - Context.Viewport.Position.x + Context.DisplaySize.width / 2;
-            int resultIsoY = cell.IsometricPosition.z - Context.Viewport.Position.y;
+        public void RenderMapCell (SdlRenderer renderer, MapTile mapTile, Viewport viewport) {
+            ImageTile imageTile;
+            var texture = TileSet.Texture;
+            int resultIsoX = mapTile.IsometricPosition.x - viewport.Position.x + (viewport.Size.width >> 1);
+            int resultIsoY = mapTile.IsometricPosition.z - viewport.Position.y;
 
-            if (cell.BlockId != ImageTileSet.NOT_SET && cell.Height > 0) {
-                tile = Context.TileSet.Blocks[cell.BlockId];
+            if (mapTile.BlockId != ImageTile.NOT_SET && mapTile.MapPosition.z > 0) {
+                imageTile = TileSet.Tiles[mapTile.BlockId];
 
-                for (var i = 0; i < cell.Height; i++) {
+                for (var i = 0; i < mapTile.MapPosition.z; i++) {
                     renderer.RenderTexture (
                         texture,
-                        resultIsoX - tile.OriginX, resultIsoY - (i + 1) * Context.CellSize.height - tile.OriginY,
-                        Context.TileSet.Blocks[cell.BlockId].GetClipRect ());
+                        resultIsoX - imageTile.OriginX, resultIsoY - (i + 1) * TileSize.height - imageTile.OriginY,
+                        TileSet.Tiles[mapTile.BlockId].GetClipRect ());
                 }
 
             }
 
-            if (cell.FloorId != ImageTileSet.NOT_SET) {
-                tile = Context.TileSet.Floors[cell.FloorId];
+            if (mapTile.FloorId != ImageTile.NOT_SET) {
+                imageTile = TileSet.Tiles[mapTile.FloorId];
 
                 renderer.RenderTexture (
                     texture,
-                    resultIsoX - tile.OriginX, resultIsoY - cell.IsometricPosition.y - tile.OriginY,
-                    tile.GetClipRect ());
+                    resultIsoX - imageTile.OriginX, resultIsoY - mapTile.IsometricPosition.y - imageTile.OriginY,
+                    imageTile.GetClipRect ());
             }
 
-            if (cell.IsSelected) {
-                tile = Context.TileSet.UserInterface[0];
+            if (mapTile.IsSelected) {
+                imageTile = TileSet.Tiles[0];
 
+                renderer.SetDrawColor(255, 255, 55);
+                renderer.DrawPoint(resultIsoX, resultIsoY);
+
+                /*
                 renderer.RenderTexture (
                     texture,
-                    resultIsoX - tile.OriginX, resultIsoY - cell.IsometricPosition.y - tile.OriginY,
-                    tile.GetClipRect ());
+                    resultIsoX - imageTile.OriginX, resultIsoY - mapTile.IsometricPosition.y - imageTile.OriginY,
+                    imageTile.GetClipRect ());
+                */
             }
 
-            if (!(cell.DecorationIds == null || cell.DecorationIds.Length == 0)) {
-                for (var tid = 0; tid < cell.DecorationIds.Length; tid++) {
-                    tile = Context.TileSet.Decorations[cell.DecorationIds[tid]];
+            if (!(mapTile.DecorationIds == null || mapTile.DecorationIds.Length == 0)) {
+                for (var tid = 0; tid < mapTile.DecorationIds.Length; tid++) {
+                    imageTile = TileSet.Tiles[mapTile.DecorationIds[tid]];
 
                     renderer.RenderTexture (
                         texture,
-                        resultIsoX - tile.OriginX, resultIsoY - cell.IsometricPosition.y - tile.OriginY,
-                        tile.GetClipRect ());
+                        resultIsoX - imageTile.OriginX, resultIsoY - mapTile.IsometricPosition.y - imageTile.OriginY,
+                        imageTile.GetClipRect ());
                 }
+            }
+
+            if(mapTile.Visitor != null) {
+                mapTile.Visitor.Render(renderer, viewport);
             }
 
         }
