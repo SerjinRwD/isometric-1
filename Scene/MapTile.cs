@@ -18,16 +18,26 @@ namespace isometric_1.Scene {
     public class MapTile {
         public Point3d IsometricPosition { get; private set; }
         public Point3d MapPosition { get; private set; }
-        public MapTileType Type { get; private set; }
-        public MapTileOrientation Orientation { get; private set; }
+        public MapTileType Type { get; set; }
+        public MapTileOrientation Orientation { get; set; }
         public AbstractActor Visitor { get; set; }
         public bool IsEmpty { get => Type != MapTileType.Wall && Visitor == null; }
         public bool IsSelected { get; set; }
-        public int FloorId { get; private set; }
-        public int BlockId { get; private set; }
+        public int FloorId { get; private set; } = ImageTile.NOT_SET;
+        public int BlockId { get; private set; } = ImageTile.NOT_SET;
         public int[] DecorationIds { get; private set; }
         public object Tag { get; set; }
 
+        /// <summary>
+        /// Конструктор для ячейки изометрической карты
+        /// </summary>
+        /// <param name="mapPosition"></param>
+        /// <param name="cellSize"></param>
+        /// <param name="type"></param>
+        /// <param name="orientation"></param>
+        /// <param name="floorId"></param>
+        /// <param name="blockId"></param>
+        /// <param name="decorationIds"></param>
         public MapTile (
             Point3d mapPosition,
             Size3d cellSize,
@@ -46,6 +56,16 @@ namespace isometric_1.Scene {
             FloorId = floorId;
             BlockId = blockId;
             DecorationIds = decorationIds;
+        }
+
+        /// <summary>
+        /// Конструктор для ячейки упрощённой двумерной карты
+        /// </summary>
+        /// <param name="mx"></param>
+        /// <param name="my"></param>
+        /// <param name="cellSize"></param>
+        public MapTile(int mx, int my) {
+            MapPosition = new Point3d(mx, 0, my);
         }
     }
 }

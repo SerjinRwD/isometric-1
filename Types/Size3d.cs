@@ -18,5 +18,16 @@ namespace isometric_1.Types {
             length = l;
             height = h;
         }
+
+        public void Deconstruct(out int w, out int l, out int h)
+        {
+            w = this.width;
+            l = this.length;
+            h = this.height;
+        }
+
+        public override string ToString() {
+            return $"({width}; {length}; {height})";
+        }
     }
 }

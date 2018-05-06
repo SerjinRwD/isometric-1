@@ -13,6 +13,17 @@ namespace isometric_1.Scene {
         public MapTile[, ] Tiles { get; private set; }
         public Dictionary<Point2d, MapTile> Hash { get; private set; }
 
+        public Map(Size2d mapSize) {
+            MapSize = mapSize;
+
+            Tiles = new MapTile[MapSize.width, MapSize.height];
+
+            for(var i = 0; i < MapSize.width; i++) {
+                for(var j = 0; j < MapSize.height; j++) {
+                    Tiles[i, j] = new MapTile(i, j);
+                }
+            }
+        }
         public Map (Size2d mapSize, IMapBuilder builder) {
 
             MapSize = mapSize;

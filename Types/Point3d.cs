@@ -30,8 +30,17 @@ namespace isometric_1.Types {
                 point.z * scale.length);
         }
 
-        public Point2d ToPoint2d() {
-            return new Point2d(x, z + y);
+        public void Deconstruct(out int x, out int y, out int z)
+        {
+            x = this.x;
+            y = this.y;
+            z = this.z;
+        }
+
+        public Point2d ToPoint2d(bool doCountY = true) {
+            return doCountY
+                ? new Point2d(x, z + y)
+                : new Point2d(x, z);
         }
 
         public override string ToString() {
