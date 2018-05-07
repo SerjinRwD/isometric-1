@@ -8,7 +8,7 @@ namespace isometric_1.PathFinder {
 
     /// <summary>
     /// <para>Алгоритм поиска A*. Описание алгоритма с псевдокодом:</para>
-    /// <para>http://neerc.ifmo.ru/wiki/index.php?title=Алгоритм_A</para>
+    /// <para>http://neerc.ifmo.ru/wiki/index.php?title=Алгоритм_A*</para>
     /// </summary>
     public class AStartPathFinder : IPathFinder {
         public class Node {
@@ -18,6 +18,7 @@ namespace isometric_1.PathFinder {
             public MapTile tile;
             public int f;
             public int g;
+            public bool closed;
 
             public Node (MapTile tile) {
                 this.tile = tile;
@@ -26,6 +27,11 @@ namespace isometric_1.PathFinder {
 
             public void Reset () {
                 f = g = 0;
+                closed = false;
+            }
+
+            public bool IsMath(Point2d point) {
+                return tile.MapPosition.x == point.x && tile.MapPosition.z == point.y;
             }
         }
 
@@ -47,32 +53,47 @@ namespace isometric_1.PathFinder {
         }
 
         public List<Point2d> Find (Point2d start, Point2d end) {
-            var result = Finding (start, end);
-
-            return result != null ?
-                Trace (start, end, result) :
-                null;
+            return Finding (start, end) ? Trace (start, end) : null;
         }
 
-        private List<Point2d> Trace (Point2d start, Point2d end, Dictionary<int, Node> nodes) {
-            var result = new List<Point2d> ();
+        private List<Point2d> Trace (Point2d start, Point2d end) {
 
-            var first = nodes.First ().Value;
-            var lastG = first.g;
+            //return null;
 
-            result.Add (first.tile.MapPosition.ToPoint2d (false));
+            var result = new List<Point2d>();
 
-            foreach (var n in nodes) { 
-                if(n.Value.g == lastG + 1) {
-                    result.Add (n.Value.tile.MapPosition.ToPoint2d (false));
-                    lastG = n.Value.g;
+            var current = Nodes[end.x, end.y];
+            result.Add(current.tile.MapPosition.ToPoint2d(false));
+
+            var neighboring = GetNeighboringNodes(current).Where(p => p.closed); //.OrderBy(s => s.f);
+            var min = neighboring.Min(s => s.g);
+            current = neighboring.FirstOrDefault(p => p.g == min);
+
+            result.Add(current.tile.MapPosition.ToPoint2d(false));
+
+            Node next = null;
+
+            while(true) {
+
+                neighboring = GetNeighboringNodes(current).Where(p => p.closed && p.g < current.g).OrderBy(s => s.f);
+
+                next = neighboring.FirstOrDefault();
+
+                if(next == null) {
+                    break;
                 }
+
+                result.Add(next.tile.MapPosition.ToPoint2d(false));
+                current = next;
             }
+
+            result.Add(start);
+            result.Reverse();
 
             return result;
         }
 
-        private Dictionary<int, Node> Finding (Point2d start, Point2d end) {
+        private bool Finding (Point2d start, Point2d end) {
 
             if (IsBusy) {
                 throw new InvalidOperationException ("AStartPathFinder is busy!");
@@ -86,43 +107,41 @@ namespace isometric_1.PathFinder {
                 }
             }
 
-            var u = new Dictionary<int, Node> ();
-            var q = new Dictionary<int, Node> ();
+            Func<Point2d, Point2d, int> heuristics = Heuristics.ManhattanDistance; // Heuristics.EuclideanDistance; // Heuristics.ChebyshevDistance; // 
+
+            var q = new Dictionary<int, Node> (); // вершины, которые требуется просмотреть
 
             Node current = Nodes[start.x, start.y];
             current.g = 0;
-            current.f = current.g + Heuristics.ManhattanDistance (start, end);
+            current.f = current.g + heuristics (start, end);
 
             q.Add (current.Id, current);
 
-            var timeout = 5000;
+            var timeout = 1000;
 
             while (timeout > 0 && q.Count > 0) {
                 // Вершина с минимальным f
                 current = q.First (p => p.Value.f == q.Min (s => s.Value.f)).Value;
                 q.Remove (current.Id);
 
-                if (current.tile.MapPosition.x == end.x && current.tile.MapPosition.z == end.y) {
+                if (current.IsMath(end)) {
                     IsBusy = false;
-                    return u;
+                    q.Clear();
+                    return true;
                 }
 
-                if (!u.ContainsKey (current.Id)) {
-                    u.Add (current.Id, current);
-                }
+                current.closed = true;
 
                 foreach (var neighbor in GetNeighboringNodes (current)) {
                     var tentativeScore = current.g + CalcMoveCost (current, neighbor);
 
-                    var uContainsNeighbor = u.ContainsKey (neighbor.Id);
-
-                    if (uContainsNeighbor && neighbor.g >= tentativeScore) {
+                    if (neighbor.closed && tentativeScore >= neighbor.g) {
                         continue;
                     }
 
-                    if (!uContainsNeighbor || neighbor.g < tentativeScore) {
+                    if (!neighbor.closed || tentativeScore < neighbor.g) {
                         neighbor.g = tentativeScore;
-                        neighbor.f = neighbor.g + Heuristics.ManhattanDistance (neighbor.tile.MapPosition.ToPoint2d (false), end);
+                        neighbor.f = neighbor.g + heuristics (neighbor.tile.MapPosition.ToPoint2d (false), end);
 
                         if (!q.ContainsKey (neighbor.Id)) {
                             q.Add (neighbor.Id, neighbor);
@@ -130,40 +149,36 @@ namespace isometric_1.PathFinder {
                     }
                 }
 
-                // Console.WriteLine($"u.Count({u.Count}), q.Count({q.Count})");
                 timeout--;
             }
 
             IsBusy = false;
-            return null;
+            q.Clear();
+            return false;
         }
 
         private int CalcMoveCost (Node from, Node to) {
-            return to.tile.IsEmpty && to.tile.Type == MapTileType.Floor ? 1 : 255;
+            return to.tile.IsEmpty && to.tile.Type == MapTileType.Floor ? 1/* + GetNeighboringNodes(to).Count(p => p.tile.Type == MapTileType.Wall)*/ : 1000;
         }
 
         private IEnumerable<Node> GetNeighboringNodes (Node node) {
 
-            (int nx, int ny) = node.tile.MapPosition.ToPoint2d (false);
+            (int x, int y) = node.tile.MapPosition.ToPoint2d (false);
+            int rx, ry;
 
-            // (+1, 0, 0)
-            if ((nx + 1) < Size.width) {
-                yield return Nodes[nx + 1, ny];
-            }
+            for(var i = -1; i < 2; i++) {
+                for(var j = -1; j < 2; j++) {
+                    if(i == 0 && j == 0) {
+                        continue;
+                    }
 
-            // (0, 0, +1)
-            if ((ny + 1) < Size.height) {
-                yield return Nodes[nx, ny + 1];
-            }
+                    rx = x + i;
+                    ry = y + j;
 
-            // (-1, 0, 0)
-            if ((nx - 1) > 0) {
-                yield return Nodes[nx - 1, ny];
-            }
-
-            // (0, 0, -1)
-            if ((ny - 1) > 0) {
-                yield return Nodes[nx, ny - 1];
+                    if(rx >= 0 && rx < Size.width && ry >= 0 && ry < Size.height) {
+                        yield return Nodes[rx, ry];
+                    }
+                }
             }
         }
     }

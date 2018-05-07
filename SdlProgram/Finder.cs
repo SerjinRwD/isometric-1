@@ -67,6 +67,11 @@ namespace isometric_1.SdlProgram {
 
             emitter.KeyDown += (s, a) => {
                 switch (a.Keycode) {
+
+                    case SDL.SDL_Keycode.SDLK_ESCAPE:
+                        _quit = true;
+                        break;
+
                     case SDL.SDL_Keycode.SDLK_1:
                         _insertMode = InsertMode.PutStart;
                         break;
@@ -100,7 +105,7 @@ namespace isometric_1.SdlProgram {
 
                 DrawMatrix ();
                 DrawPathFinder ();
-                //DrawPath ();
+                DrawPath ();
 
                 Renderer.Present ();
             }
@@ -182,6 +187,7 @@ namespace isometric_1.SdlProgram {
                 for (var j = 0; j < _height; j++) {
                     var n = _pathFinder.Nodes[i, j];
                     Renderer.DrawText ($"tile:", i * _cellSize + 2, j * _cellSize + 10, _font);
+                    Renderer.DrawText ($"{(n.closed ? "c" : " ")}", i * _cellSize + _cellSize - 10, j * _cellSize + 10, _font);
                     Renderer.DrawText ($"{n.tile.MapPosition.ToPoint2d(false)}", i * _cellSize + 2, j * _cellSize + 19, _font);
                     Renderer.DrawText ($"f/g:", i * _cellSize + 2, j * _cellSize + 28, _font);
                     Renderer.DrawText ($"{(n.f == int.MaxValue ? -1 : n.f)}/{(n.g == int.MaxValue ? -1 : n.g)}", i * _cellSize + 2, j * _cellSize + 37, _font);
@@ -190,17 +196,17 @@ namespace isometric_1.SdlProgram {
         }
 
         private void DrawPath () {
-            if(_path == null || _path.Count == 0) {
+            if (_path == null || _path.Count == 0) {
                 return;
             }
 
             Renderer.SetDrawColor (_colorPoint);
 
-            for(var i = 1; i < _path.Count; i++) {
+            for (var i = 1; i < _path.Count; i++) {
                 var _prev = _path[i - 1];
                 var _cur = _path[i];
 
-                Renderer.DrawLine(_prev * (_cellSize, _cellSize) + (_cellSize / 2, _cellSize / 2), _cur * (_cellSize, _cellSize) + (_cellSize / 2, _cellSize / 2));
+                Renderer.DrawLine (_prev * (_cellSize, _cellSize) + (_cellSize / 2, _cellSize / 2), _cur * (_cellSize, _cellSize) + (_cellSize / 2, _cellSize / 2));
             }
         }
     }
