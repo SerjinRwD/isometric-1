@@ -1,6 +1,7 @@
 namespace isometric_1.Scene {
     using System.Collections.Generic;
     using System;
+
     using isometric_1.Contract;
     using isometric_1.Helpers;
     using isometric_1.Types;
@@ -17,7 +18,8 @@ namespace isometric_1.Scene {
 
     public class MapTile {
         public Point3d IsometricPosition { get; private set; }
-        public Point3d MapPosition { get; private set; }
+        public Point2d MapPosition { get; private set; }
+        public int Level { get; set; }
         public MapTileType Type { get; set; }
         public MapTileOrientation Orientation { get; set; }
         public AbstractActor Visitor { get; set; }
@@ -39,7 +41,8 @@ namespace isometric_1.Scene {
         /// <param name="blockId"></param>
         /// <param name="decorationIds"></param>
         public MapTile (
-            Point3d mapPosition,
+            Point2d mapPosition,
+            int level,
             Size3d cellSize,
             MapTileType type,
             MapTileOrientation orientation = MapTileOrientation.ZY,
@@ -48,7 +51,8 @@ namespace isometric_1.Scene {
             int[] decorationIds = null) {
 
             MapPosition = mapPosition;
-            IsometricPosition = Point3d.CalcIsometric (mapPosition, cellSize);
+            Level = level;
+            IsometricPosition = Point3d.CalcIsometric (mapPosition.x, Level * cellSize.height, mapPosition.y, cellSize);
             Type = type;
             Orientation = orientation;
             IsSelected = false;
@@ -64,8 +68,8 @@ namespace isometric_1.Scene {
         /// <param name="mx"></param>
         /// <param name="my"></param>
         /// <param name="cellSize"></param>
-        public MapTile(int mx, int my) {
-            MapPosition = new Point3d(mx, 0, my);
+        public MapTile (int mx, int my) {
+            MapPosition = new Point2d (mx, my);
         }
     }
 }

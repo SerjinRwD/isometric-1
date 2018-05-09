@@ -25,8 +25,8 @@ namespace isometric_1.Scene {
         [XmlAttribute]
         public int[] DecorationIds { get; set; }
 
-        public MapTile Create (Point3d mapPosition) {
-            return new MapTile (mapPosition, Library.TileSize, Type, Orientation, FloorId, BlockId, DecorationIds);
+        public MapTile Create (Point2d mapPosition, int level = 0) {
+            return new MapTile (mapPosition, level, Library.TileSize, Type, Orientation, FloorId, BlockId, DecorationIds);
         }
     }
 }

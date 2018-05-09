@@ -6,19 +6,16 @@ namespace isometric_1.Scene {
     using isometric_1.Types;
     using SDL2;
 
-    public class Viewport : ISdlEventListener, IUpdateable {
+    public class Viewport : AbstractSdlEventListener, IUpdateable {
         public SceneContext Context { get; private set; }
-        public Point2d Position { get; private set; }
+        public Point2d Position { get; /*private */set; }
         public Point2d BottomRight { get; private set; }
         public Size2d Size { get; private set; }
         public Direction Direction { get; private set; }
         public bool IsMove { get; private set; }
 
-        private int _precalculatedCellWidthHalf;
-        private int _precalculatedCellLengthHalf;
-        private int _precalculatedCellLengthQuarter;
 
-        private Point2d _prevIsoTile = new Point2d (0, 0);
+        private MapTile _prevTile;
 
         private static Dictionary<Direction, Action<Viewport>> _handling = new Dictionary<Direction, Action<Viewport>> { // Я ленивый и терпеть не могу switch-конструкцию
             { Direction.Right, v => v.Position += (5, 0) },
@@ -39,42 +36,37 @@ namespace isometric_1.Scene {
             Position = new Point2d (x, y);
             BottomRight = new Point2d (x + size.width, y + size.height);
             Size = size;
-
-            _precalculatedCellWidthHalf = Context.Map.TileSize.width >> 1;
-            _precalculatedCellLengthHalf = Context.Map.TileSize.length >> 1;
-            _precalculatedCellLengthQuarter = Context.Map.TileSize.length >> 2;
         }
 
-        public void OnKeyDown (object sender, SdlKeyboardEventArgs args) {
+        public override void OnKeyDown (object sender, SdlKeyboardEventArgs args) {
             if (_mapping.ContainsKey (args.Keycode)) {
                 Direction = _mapping[args.Keycode];
                 IsMove = true;
             }
         }
 
-        public void OnKeyUp (object sender, SdlKeyboardEventArgs args) {
+        public override void OnKeyUp (object sender, SdlKeyboardEventArgs args) {
             if (_mapping.ContainsKey (args.Keycode)) {
                 IsMove = false;
             }
         }
 
-        public void OnMouseMotion (object sender, SdlMouseMotionEventArgs args) {
+        public Point2d GetCursorPos(int mouseX, int mouseY) {
+            return new Point2d(mouseX + Position.x - (Size.width >> 1), mouseY + Position.y);
+        }
 
-            var cursorX = args.MouseMotionEvent.x + Position.x - (Size.width >> 1);
-            var cursorY = args.MouseMotionEvent.y + Position.y;
+        public override void OnMouseMotion (object sender, SdlMouseMotionEventArgs args) {
 
-            var isoTileX = cursorX / _precalculatedCellWidthHalf * _precalculatedCellWidthHalf;
-            var isoTileY = cursorY / _precalculatedCellLengthHalf * _precalculatedCellLengthHalf + (isoTileX % 2 == 0 ? 0 : _precalculatedCellLengthQuarter);
+            var cursorPos = GetCursorPos(args.MouseMotionEvent.x, args.MouseMotionEvent.y);
 
-            var currentIsoTile = new Point2d (
-                isoTileX,
-                isoTileY);
+            var current = Context.Map.TileAtScreenPos(cursorPos);
 
-            Context.Map.Hash[_prevIsoTile].IsSelected = false;
-
-            if (Context.Map.Hash.ContainsKey (currentIsoTile)) {
-                Context.Map.Hash[currentIsoTile].IsSelected = true;
-                _prevIsoTile = currentIsoTile;
+            if (current != null) {
+                if(_prevTile != null) {
+                    _prevTile.IsSelected = false;
+                }
+                current.IsSelected = true;
+                _prevTile = current;
             }
 
             // debug

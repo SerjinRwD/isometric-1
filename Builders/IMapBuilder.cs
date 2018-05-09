@@ -1,4 +1,4 @@
-namespace isometric_1.Contract {
+namespace isometric_1.Builders {
     using System;
     using isometric_1.Scene;
     using isometric_1.Types;
@@ -7,6 +7,6 @@ namespace isometric_1.Contract {
         ImageTileSet TileSet { get; }
         Size3d TileSize { get; }
         MapTilePrototypeLibrary Library { get; }
-        MapTile[, ] Build (Size2d mapSize);
+        MapBuildResult Build (Size2d mapSize);
     }
 }

@@ -6,6 +6,6 @@ namespace isometric_1.PathFinder
 
     public interface IPathFinder
     {
-        List<Point2d> Find(Point2d start, Point2d end);
+        Stack<Point2d> Find(Point2d start, Point2d end);
     }
 }

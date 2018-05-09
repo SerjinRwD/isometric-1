@@ -7,7 +7,7 @@ namespace isometric_1.Builders {
     public class RandomMapBuilder : AbstractMapBuilder {
         public RandomMapBuilder (MapTilePrototypeLibrary library) : base (library) { }
         
-        public override MapTile[, ] Build (Size2d mapSize) {
+        public override MapBuildResult Build (Size2d mapSize) {
             throw new NotImplementedException ();
         }
     }

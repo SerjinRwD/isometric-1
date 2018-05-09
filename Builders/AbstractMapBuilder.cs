@@ -12,7 +12,7 @@ namespace isometric_1.Builders {
         public ImageTileSet TileSet { get => _tileSet; }
         public Size3d TileSize { get => _tileSize; }
         public MapTilePrototypeLibrary Library { get => _library; }
-        public abstract MapTile[, ] Build (Size2d mapSize);
+        public abstract MapBuildResult Build (Size2d mapSize);
 
         public AbstractMapBuilder (MapTilePrototypeLibrary library) {
             _tileSet = library.TileSet;

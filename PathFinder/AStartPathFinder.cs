@@ -31,7 +31,7 @@ namespace isometric_1.PathFinder {
             }
 
             public bool IsMath(Point2d point) {
-                return tile.MapPosition.x == point.x && tile.MapPosition.z == point.y;
+                return tile.MapPosition.x == point.x && tile.MapPosition.y == point.y;
             }
         }
 
@@ -52,24 +52,24 @@ namespace isometric_1.PathFinder {
             }
         }
 
-        public List<Point2d> Find (Point2d start, Point2d end) {
+        public Stack<Point2d> Find (Point2d start, Point2d end) {
             return Finding (start, end) ? Trace (start, end) : null;
         }
 
-        private List<Point2d> Trace (Point2d start, Point2d end) {
+        private Stack<Point2d> Trace (Point2d start, Point2d end) {
 
             //return null;
 
-            var result = new List<Point2d>();
+            var result = new Stack<Point2d>();
 
             var current = Nodes[end.x, end.y];
-            result.Add(current.tile.MapPosition.ToPoint2d(false));
+            result.Push(current.tile.MapPosition);
 
             var neighboring = GetNeighboringNodes(current).Where(p => p.closed); //.OrderBy(s => s.f);
             var min = neighboring.Min(s => s.g);
             current = neighboring.FirstOrDefault(p => p.g == min);
 
-            result.Add(current.tile.MapPosition.ToPoint2d(false));
+            result.Push(current.tile.MapPosition);
 
             Node next = null;
 
@@ -83,12 +83,12 @@ namespace isometric_1.PathFinder {
                     break;
                 }
 
-                result.Add(next.tile.MapPosition.ToPoint2d(false));
+                result.Push(next.tile.MapPosition);
                 current = next;
             }
 
-            result.Add(start);
-            result.Reverse();
+            //result.Add(start);
+            //result.Reverse();
 
             return result;
         }
@@ -141,7 +141,7 @@ namespace isometric_1.PathFinder {
 
                     if (!neighbor.closed || tentativeScore < neighbor.g) {
                         neighbor.g = tentativeScore;
-                        neighbor.f = neighbor.g + heuristics (neighbor.tile.MapPosition.ToPoint2d (false), end);
+                        neighbor.f = neighbor.g + heuristics (neighbor.tile.MapPosition, end);
 
                         if (!q.ContainsKey (neighbor.Id)) {
                             q.Add (neighbor.Id, neighbor);
@@ -163,7 +163,7 @@ namespace isometric_1.PathFinder {
 
         private IEnumerable<Node> GetNeighboringNodes (Node node) {
 
-            (int x, int y) = node.tile.MapPosition.ToPoint2d (false);
+            (int x, int y) = node.tile.MapPosition;
             int rx, ry;
 
             for(var i = -1; i < 2; i++) {

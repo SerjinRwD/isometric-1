@@ -18,6 +18,14 @@ namespace isometric_1.Types
             return new Point2d(p1.x + p2.Item1, p1.y + p2.Item2);
         }
 
+        public static Point2d operator -(Point2d p1, Point2d p2) {
+            return new Point2d(p1.x - p2.x, p1.y - p2.y);
+        }
+
+        public static Point2d operator -(Point2d p1, (int, int) p2) {
+            return new Point2d(p1.x - p2.Item1, p1.y - p2.Item2);
+        }
+
         public static Point2d operator *(Point2d p1, (int, int) p2) {
             return new Point2d(p1.x * p2.Item1, p1.y * p2.Item2);
         }

@@ -1,9 +1,12 @@
 namespace isometric_1.Scene {
     using System.Collections.Generic;
     using System;
+
+    using isometric_1.Builders;
     using isometric_1.Contract;
     using isometric_1.Helpers;
     using isometric_1.Types;
+
     using ManagedSdl;
 
     public sealed class Map : IRenderable {
@@ -12,24 +15,35 @@ namespace isometric_1.Scene {
         public ImageTileSet TileSet { get; private set; }
         public MapTile[, ] Tiles { get; private set; }
         public Dictionary<Point2d, MapTile> Hash { get; private set; }
+        public List<Marker> Markers { get; private set; }
+        private int _precalculatedCellWidthHalf;
+        private int _precalculatedCellLengthHalf;
+        private int _precalculatedCellLengthQuarter;
 
-        public Map(Size2d mapSize) {
+        public Map (Size2d mapSize) {
             MapSize = mapSize;
 
             Tiles = new MapTile[MapSize.width, MapSize.height];
 
-            for(var i = 0; i < MapSize.width; i++) {
-                for(var j = 0; j < MapSize.height; j++) {
-                    Tiles[i, j] = new MapTile(i, j);
+            for (var i = 0; i < MapSize.width; i++) {
+                for (var j = 0; j < MapSize.height; j++) {
+                    Tiles[i, j] = new MapTile (i, j);
                 }
             }
         }
         public Map (Size2d mapSize, IMapBuilder builder) {
 
+            var result = builder.Build (mapSize);
+
+            Markers = result.Markers;
             MapSize = mapSize;
+            Tiles = result.Tiles;
             TileSet = builder.TileSet;
             TileSize = builder.TileSize;
-            Tiles = builder.Build (mapSize);
+
+            _precalculatedCellWidthHalf = TileSize.width >> 1;
+            _precalculatedCellLengthHalf = TileSize.length >> 1;
+            _precalculatedCellLengthQuarter = TileSize.length >> 2;
 
             Hash = new Dictionary<Point2d, MapTile> ();
 
@@ -85,10 +99,10 @@ namespace isometric_1.Scene {
             int resultIsoX = mapTile.IsometricPosition.x - viewport.Position.x + (viewport.Size.width >> 1);
             int resultIsoY = mapTile.IsometricPosition.z - viewport.Position.y;
 
-            if (mapTile.BlockId != ImageTile.NOT_SET && mapTile.MapPosition.z > 0) {
+            if (mapTile.BlockId != ImageTile.NOT_SET && mapTile.Level > 0) {
                 imageTile = TileSet.Tiles[mapTile.BlockId];
 
-                for (var i = 0; i < mapTile.MapPosition.z; i++) {
+                for (var i = 0; i < mapTile.Level; i++) {
                     renderer.RenderTexture (
                         texture,
                         resultIsoX - imageTile.OriginX, resultIsoY - (i + 1) * TileSize.height - imageTile.OriginY,
@@ -109,8 +123,8 @@ namespace isometric_1.Scene {
             if (mapTile.IsSelected) {
                 imageTile = TileSet.Tiles[0];
 
-                renderer.SetDrawColor(255, 255, 55);
-                renderer.DrawPoint(resultIsoX, resultIsoY);
+                renderer.SetDrawColor (255, 255, 55);
+                renderer.DrawPoint (resultIsoX, resultIsoY);
 
                 /*
                 renderer.RenderTexture (
@@ -131,10 +145,21 @@ namespace isometric_1.Scene {
                 }
             }
 
-            if(mapTile.Visitor != null) {
-                mapTile.Visitor.Render(renderer, viewport);
+            if (mapTile.Visitor != null) {
+                mapTile.Visitor.Render (renderer, viewport);
             }
 
+        }
+
+        public MapTile TileAtScreenPos (Point2d screenPos) {
+            var isoTileX = screenPos.x / _precalculatedCellWidthHalf * _precalculatedCellWidthHalf;
+            var isoTileY = screenPos.y / _precalculatedCellLengthHalf * _precalculatedCellLengthHalf + (isoTileX % 2 == 0 ? 0 : _precalculatedCellLengthQuarter);
+
+            var currentIsoTile = new Point2d (
+                isoTileX,
+                isoTileY);
+
+            return Hash.ContainsKey (currentIsoTile) ? Hash[currentIsoTile] : null;
         }
     }
 }

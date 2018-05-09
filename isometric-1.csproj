@@ -7,7 +7,9 @@
   <ItemGroup>
       <None Include="resources/fonts/DejaVuSansMono.ttf" CopyToOutputDirectory="PreserveNewest" />
       <None Include="resources/images/demo.bmp" CopyToOutputDirectory="PreserveNewest" />
+      <None Include="resources/images/global.bmp" CopyToOutputDirectory="PreserveNewest" />
       <None Include="resources/tilesets/demo.xml" CopyToOutputDirectory="PreserveNewest" />
+      <None Include="resources/tilesets/global.xml" CopyToOutputDirectory="PreserveNewest" />
       <None Include="resources/libraries/demo.xml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
