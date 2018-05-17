@@ -19,7 +19,6 @@ namespace isometric_1.SdlProgram {
             PutFloor
         }
 
-        Map _map;
         int _width;
         int _height;
         int _cellSize;
@@ -40,7 +39,6 @@ namespace isometric_1.SdlProgram {
         bool _doInsert;
         bool _quit;
 
-        AStartPathFinder _pathFinder;
         List<Point2d> _path;
 
         public override void Init () {
@@ -52,11 +50,11 @@ namespace isometric_1.SdlProgram {
             _width = Window.Size.width / _cellSize;
             _height = Window.Size.height / _cellSize;
 
-            _map = new Map (new Size2d (_width, _height));
-            _pathFinder = new AStartPathFinder (_map);
+            SceneContext.Init(new Size2d (_width, _height), new Size2d(0, 0), null);
+
             _font = SdlFont.LoadFromTTF (Resources.GetFilePath ("fonts", "DejaVuSansMono.ttf"), 9);
 
-            Console.WriteLine ($"MapSize: {_map.MapSize}");
+            Console.WriteLine ($"MapSize: {SceneContext.Current.Map.MapSize}");
         }
 
         public override void Run () {
@@ -115,27 +113,33 @@ namespace isometric_1.SdlProgram {
 
             (int x, int y) = _cursorOnMap;
 
+            var tile = SceneContext.Current.Map.Tiles[x, y];
+
             if (_doInsert) {
                 switch (_insertMode) {
                     case InsertMode.PutStart:
-                        _map.Tiles[x, y].Type = MapTileType.Floor;
+                        tile.TileType = MapTileType.Floor;
+                        tile.ForceNeighborsRecalculateEdges();
                         _startPoint = _cursorOnMap;
                         break;
 
                     case InsertMode.PutEnd:
-                        _map.Tiles[x, y].Type = MapTileType.Floor;
+                        tile.TileType = MapTileType.Floor;
+                        tile.ForceNeighborsRecalculateEdges();
                         _endPoint = _cursorOnMap;
-                        var stack = _pathFinder.Find (_startPoint, _endPoint);
+                        var stack = SceneContext.Current.PathFinder.Find (_startPoint, _endPoint);
                         stack.Push(_startPoint);
                         _path = new List<Point2d>(stack.ToArray());
                         break;
 
                     case InsertMode.PutWall:
-                        _map.Tiles[x, y].Type = MapTileType.Wall;
+                        tile.TileType = MapTileType.Wall;
+                        tile.ForceNeighborsRecalculateEdges();
                         break;
 
                     case InsertMode.PutFloor:
-                        _map.Tiles[x, y].Type = MapTileType.Floor;
+                        tile.TileType = MapTileType.Floor;
+                        tile.ForceNeighborsRecalculateEdges();
                         break;
                 }
             }
@@ -147,7 +151,7 @@ namespace isometric_1.SdlProgram {
             // tiles
             for (var i = 0; i < _width; i++) {
                 for (var j = 0; j < _height; j++) {
-                    if (_map.Tiles[i, j].Type == MapTileType.Wall) {
+                    if (SceneContext.Current.Map.Tiles[i, j].TileType == MapTileType.Wall) {
                         Renderer.SetDrawColor (_colorWall);
                         Renderer.DrawRect (i * _cellSize, j * _cellSize, _cellSize, _cellSize, true);
                     }
@@ -187,12 +191,20 @@ namespace isometric_1.SdlProgram {
 
             for (var i = 0; i < _width; i++) {
                 for (var j = 0; j < _height; j++) {
-                    var n = _pathFinder.Nodes[i, j];
-                    Renderer.DrawText ($"tile:", i * _cellSize + 2, j * _cellSize + 10, _font);
-                    Renderer.DrawText ($"{(n.closed ? "c" : " ")}", i * _cellSize + _cellSize - 10, j * _cellSize + 10, _font);
-                    Renderer.DrawText ($"{n.tile.MapPosition}", i * _cellSize + 2, j * _cellSize + 19, _font);
+                    var n = SceneContext.Current.Map.Tiles[i, j];
+
+/*
+                    Renderer.DrawText ($"{(n.closed ? "c" : " ")}", i * _cellSize + _cellSize - 10, j * _cellSize + 4, _font);
+                    Renderer.DrawText ($"{n.MapPosition}", i * _cellSize + 2, j * _cellSize + 4, _font);
+
                     Renderer.DrawText ($"f/g:", i * _cellSize + 2, j * _cellSize + 28, _font);
                     Renderer.DrawText ($"{(n.f == int.MaxValue ? -1 : n.f)}/{(n.g == int.MaxValue ? -1 : n.g)}", i * _cellSize + 2, j * _cellSize + 37, _font);
+ */
+
+                    foreach(var key in n.Neighbors.Keys) {
+                        var d = (int)key;
+                        Renderer.DrawText($"{key}", i * _cellSize + (3 - d % 3) * 12, j * _cellSize + (d / 3) * 10, _font);
+                    }
                 }
             }
         }

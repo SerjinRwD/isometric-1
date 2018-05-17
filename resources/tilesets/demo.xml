@@ -4,10 +4,13 @@
   <Description>Пробный тайлсет</Description>
   <BitmapFile>demo.bmp</BitmapFile>
   <Tiles>
-    <ImageTile OrderId="0" OffsetX="0" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
-    <ImageTile OrderId="1" OffsetX="0" OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
-    <ImageTile OrderId="2" OffsetX="54" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="13" />
-    <ImageTile OrderId="3" OffsetX="108" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
-    <ImageTile OrderId="4" OffsetX="108" OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="0" Name="grass"  OffsetX="0"   OffsetY="0"  Width="54" Height="27" OriginX="27" OriginY="12" RegistrationX="26" RegistrationY="0" />
+    <ImageTile OrderId="1" Name="gravel" OffsetX="0"   OffsetY="54" Width="54" Height="27" OriginX="27" OriginY="12" RegistrationX="26" RegistrationY="0" />
+    <ImageTile OrderId="2" Name="wall-s" OffsetX="54"  OffsetY="0"  Width="27" Height="40" OriginX="27" OriginY="-1"  RegistrationX="0"  RegistrationY="0" />
+    <ImageTile OrderId="7" Name="wall-e" OffsetX="81"  OffsetY="0"  Width="27" Height="40" OriginX="0"  OriginY="-1"  RegistrationX="0"  RegistrationY="0" />
+    <ImageTile OrderId="5" Name="ramp-n" OffsetX="54"  OffsetY="39" Width="54" Height="54" OriginX="27" OriginY="39" RegistrationX="26" RegistrationY="27" />
+    <ImageTile OrderId="6" Name="ramp-w" OffsetX="54"  OffsetY="93" Width="54" Height="54" OriginX="27" OriginY="39" RegistrationX="26" RegistrationY="27" />
+    <ImageTile OrderId="3" Name="tree"   OffsetX="108" OffsetY="0"  Width="54" Height="54" OriginX="27" OriginY="39" RegistrationX="27" RegistrationY="39" />
+    <ImageTile OrderId="4" Name="corpse" OffsetX="108" OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" RegistrationX="27" RegistrationY="39" />
   </Tiles>
 </ImageTileSetMetadata>

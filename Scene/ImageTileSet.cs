@@ -3,7 +3,9 @@ namespace isometric_1.Scene {
     using System.Xml.Serialization;
     using System.Xml;
     using System;
+
     using isometric_1.Helpers;
+
     using ManagedSdl;
 
     public class ImageTileSet {
@@ -14,14 +16,18 @@ namespace isometric_1.Scene {
             Texture = SdlTexture.LoadFromBitmap (Resources.GetFilePath ("images", metadata.BitmapFile), renderer);
 
             Tiles = metadata.Tiles;
+
+            foreach (var t in Tiles) {
+                t.Texture = Texture;
+            }
         }
 
-        public static ImageTileSet Load(string path, SdlRenderer renderer) {
-            var metadata = ImageTileSetMetadata.Load(path);
+        public static ImageTileSet Load (string path, SdlRenderer renderer) {
+            var metadata = ImageTileSetMetadata.Load (path);
 
-            Array.Sort(metadata.Tiles, ImageTile.Comparison);
-            
-            return new ImageTileSet(metadata, renderer);
+            Array.Sort (metadata.Tiles, ImageTile.Comparison);
+
+            return new ImageTileSet (metadata, renderer);
         }
 
         public ImageTileSet (SdlTexture texture, ImageTile[] tiles) {

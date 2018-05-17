@@ -7,7 +7,6 @@ namespace isometric_1.Scene {
     using SDL2;
 
     public class Viewport : AbstractSdlEventListener, IUpdateable {
-        public SceneContext Context { get; private set; }
         public Point2d Position { get; /*private */set; }
         public Point2d BottomRight { get; private set; }
         public Size2d Size { get; private set; }
@@ -18,21 +17,20 @@ namespace isometric_1.Scene {
         private MapTile _prevTile;
 
         private static Dictionary<Direction, Action<Viewport>> _handling = new Dictionary<Direction, Action<Viewport>> { // Я ленивый и терпеть не могу switch-конструкцию
-            { Direction.Right, v => v.Position += (5, 0) },
-            { Direction.Up, v => v.Position += (0, -5) },
-            { Direction.Left, v => v.Position += (-5, 0) },
-            { Direction.Down, v => v.Position += (0, 5) }
+            { Direction.E, v => v.Position += (5, 0) },
+            { Direction.N, v => v.Position += (0, -5) },
+            { Direction.W, v => v.Position += (-5, 0) },
+            { Direction.S, v => v.Position += (0, 5) }
         };
 
         private static Dictionary<SDL.SDL_Keycode, Direction> _mapping = new Dictionary<SDL.SDL_Keycode, Direction> { // 
-            { SDL.SDL_Keycode.SDLK_RIGHT, Direction.Right },
-            { SDL.SDL_Keycode.SDLK_UP, Direction.Up },
-            { SDL.SDL_Keycode.SDLK_DOWN, Direction.Down },
-            { SDL.SDL_Keycode.SDLK_LEFT, Direction.Left }
+            { SDL.SDL_Keycode.SDLK_RIGHT, Direction.E },
+            { SDL.SDL_Keycode.SDLK_UP, Direction.N },
+            { SDL.SDL_Keycode.SDLK_DOWN, Direction.S },
+            { SDL.SDL_Keycode.SDLK_LEFT, Direction.W }
         };
 
-        public Viewport (SceneContext context, int x, int y, Size2d size) {
-            Context = context;
+        public Viewport (int x, int y, Size2d size) {
             Position = new Point2d (x, y);
             BottomRight = new Point2d (x + size.width, y + size.height);
             Size = size;
@@ -59,7 +57,7 @@ namespace isometric_1.Scene {
 
             var cursorPos = GetCursorPos(args.MouseMotionEvent.x, args.MouseMotionEvent.y);
 
-            var current = Context.Map.TileAtScreenPos(cursorPos);
+            var current = SceneContext.Current.Map.TileAtScreenPos(cursorPos);
 
             if (current != null) {
                 if(_prevTile != null) {
@@ -68,12 +66,6 @@ namespace isometric_1.Scene {
                 current.IsSelected = true;
                 _prevTile = current;
             }
-
-            // debug
-            /*
-            var cursor = new Point2d(cursorX, cursorY);
-            Console.WriteLine ($"mouse: {cursor}, hash: {key}, match: {Context.Map.Hash.ContainsKey (key)}");
-            */
         }
 
         public void Update () {

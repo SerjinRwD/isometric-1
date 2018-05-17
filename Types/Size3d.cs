@@ -8,12 +8,7 @@ namespace isometric_1.Types {
         [XmlAttribute]
         public int height;
 
-        public Size3d ((int, int, int) size) {
-            width = size.Item1;
-            length = size.Item2;
-            height = size.Item3;
-        }
-        public Size3d (int w, int l, int h) {
+        public Size3d (int w, int h, int l) {
             width = w;
             length = l;
             height = h;

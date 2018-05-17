@@ -14,19 +14,22 @@ namespace isometric_1.Scene {
         public MapTileType Type { get; set; }
 
         [XmlAttribute]
-        public MapTileOrientation Orientation { get; set; }
+        public Direction Orientation { get; set; }
 
         [XmlAttribute]
         public int FloorId { get; set; }
 
         [XmlAttribute]
-        public int BlockId { get; set; }
+        public int WallSouthId { get; set; }
 
         [XmlAttribute]
-        public int[] DecorationIds { get; set; }
+        public int WallNorthId { get; set; }
 
         public MapTile Create (Point2d mapPosition, int level = 0) {
-            return new MapTile (mapPosition, level, Library.TileSize, Type, Orientation, FloorId, BlockId, DecorationIds);
+            return new MapTile (
+                mapPosition, level, Library.TileSize, Type,
+                Library.TileSet.Tiles[FloorId], Library.TileSet.Tiles[WallSouthId], Library.TileSet.Tiles[WallNorthId],
+                Orientation);
         }
     }
 }

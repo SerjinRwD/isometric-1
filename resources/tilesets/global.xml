@@ -4,7 +4,9 @@
   <Description>Тайлсет глобального уровня: персонажи, UI</Description>
   <BitmapFile>global.bmp</BitmapFile>
   <Tiles>
-    <ImageTile OrderId="0" OffsetX="0" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="0" OffsetX="0"  OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" RegistrationX="54" RegistrationY="54" />
     <ImageTile OrderId="1" OffsetX="54" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="2" OffsetX="0"  OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="3" OffsetX="54" OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
   </Tiles>
 </ImageTileSetMetadata>

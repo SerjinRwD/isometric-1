@@ -1,9 +1,15 @@
 namespace isometric_1.Scene {
     using System.Xml.Serialization;
+
+    using isometric_1.ManagedSdl;
+
     using SDL2;
 
     public class ImageTile {
         public const int NOT_SET = -1;
+
+        [XmlIgnore]
+        public SdlTexture Texture { get; set; }
 
         [XmlAttribute]
         public int OrderId { get; set; }
@@ -13,6 +19,12 @@ namespace isometric_1.Scene {
 
         [XmlAttribute]
         public int OffsetY { get; set; }
+
+        [XmlAttribute]
+        public int RegistrationX { get; set; }
+
+        [XmlAttribute]
+        public int RegistrationY { get; set; }
 
         [XmlAttribute]
         public int Width { get; set; }

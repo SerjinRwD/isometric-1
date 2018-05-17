@@ -9,7 +9,7 @@ namespace isometric_1.ManagedSdl {
 
         public void Dispose () {
             Dispose (true);
-            GC.SuppressFinalize (this);
+            //GC.SuppressFinalize (this);
         }
 
         protected virtual void Dispose (bool disposing) {

@@ -57,23 +57,23 @@
             var library = new MapTilePrototypeLibrary {
                 Name = "Template of Library",
                 ImageTileSetFile = "path/to/your/tileset",
-                TileSize = new Size3d (54, 54, 27),
+                TileSize = new Size3d (54, 27, 54),
                 Tiles = new MapTilePrototype[] {
                     new MapTilePrototype {
                         Name = "prototype1",
                         Type = MapTileType.Floor,
-                        Orientation = MapTileOrientation.XY,
+                        Orientation = Direction.N,
                         FloorId = 0,
-                        BlockId = ImageTile.NOT_SET,
-                        DecorationIds = new int[] { 1, 2 }
+                        WallSouthId = ImageTile.NOT_SET,
+                        WallNorthId = ImageTile.NOT_SET,
                     },
                     new MapTilePrototype {
                         Name = "prototype2",
                         Type = MapTileType.Wall,
-                        Orientation = MapTileOrientation.XY,
+                        Orientation = Direction.N,
                         FloorId = ImageTile.NOT_SET,
-                        BlockId = 1,
-                        DecorationIds = null
+                        WallSouthId = 1,
+                        WallNorthId = ImageTile.NOT_SET,
                     }
                 }
             };

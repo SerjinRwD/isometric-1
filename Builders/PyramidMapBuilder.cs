@@ -13,7 +13,7 @@ namespace isometric_1.Builders {
 
             for (var i = 0; i < mapSize.width; i++) {
                 for (var j = 0; j < mapSize.height; j++) {
-                    Library.HashedTiles["field"].Create (new Point2d (i, j), (i + j) % 3);
+                    tiles[i, j] = Library.HashedTiles["field"].Create (new Point2d (i, j), (i + j) % 3);
                 }
             }
 

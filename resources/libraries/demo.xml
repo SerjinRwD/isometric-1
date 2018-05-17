@@ -4,8 +4,8 @@
   <ImageTileSetFile>demo.xml</ImageTileSetFile>
   <TileSize width="52" length="52" height="27" />
   <Tiles>
-    <MapTilePrototype Name="field" Type="Floor" Orientation="XY" FloorId="0" BlockId="-1" />
-    <MapTilePrototype Name="field-w-tree-1" Type="Wall" Orientation="XY" FloorId="0" BlockId="-1" DecorationIds="3" />
-    <MapTilePrototype Name="field-w-corpse-1" Type="Floor" Orientation="XY" FloorId="0" BlockId="-1" DecorationIds="4" />
+    <MapTilePrototype Name="field"    Type="Floor" Orientation="N" FloorId="0" WallSouthId="2" WallNorthId="7" />
+    <MapTilePrototype Name="ramp-n-1" Type="Ramp"  Orientation="N" FloorId="5" WallSouthId="2" WallNorthId="7" />
+    <MapTilePrototype Name="ramp-w-1" Type="Ramp"  Orientation="W" FloorId="6" WallSouthId="2" WallNorthId="7" />
   </Tiles>
 </MapTilePrototypeLibrary>
