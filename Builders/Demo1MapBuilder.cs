@@ -3,6 +3,7 @@ namespace isometric_1.Builders {
     using System;
 
     using isometric_1.Contract;
+    using isometric_1.ManagedSdl;
     using isometric_1.Scene;
     using isometric_1.Types;
 
@@ -14,47 +15,74 @@ namespace isometric_1.Builders {
             var markers = new List<Marker> ();
             var rnd = new Random ();
             var putPlayer = false;
+            var lights1Count = 4;
+            var lights2Count = 2;
+            var treesCount = ((mapSize.width * mapSize.height) / 100) * 10;
+            int i, j, n;
 
-            for (var i = 0; i < mapSize.width; i++) {
-                for (var j = 0; j < mapSize.height; j++) {
-                    var n = rnd.Next (1, 100);
+            GlobalLight = new Lighting (SdlColorFactory.FromRGB ("#ffffff"), 10);
 
-                    if (n < 51) {
-                        var rx = Math.Max (0, i - 1);
-                        var ry = Math.Max (0, j - 1);
+            for (i = 0; i < mapSize.width; i++) {
+                for (j = 0; j < mapSize.height; j++) {
+                    n = rnd.Next (1, 100);
 
-                        if (tiles[rx, j] != null && tiles[rx, j].Level > 0) {
-                            tiles[i, j] = Library.HashedTiles["ramp-w-1"].Create (new Point2d (i, j), tiles[rx, j].Level - 1);
-                        } else if (tiles[i, ry] != null && tiles[i, ry].Level > 0) {
-                            tiles[i, j] = Library.HashedTiles["ramp-n-1"].Create (new Point2d (i, j), tiles[i, ry].Level - 1);
-                        } else {
-                            tiles[i, j] = Library.HashedTiles["field"].Create (new Point2d (i, j));
-
-                            if (!putPlayer) {
-                                markers.Add (new Marker (new Point2d (i, j), "player-1"));
-                                putPlayer = true;
-                            }
-                        }
-
-                    } else if (n < 71) {
-                        tiles[i, j] = Library.HashedTiles["field"].Create (new Point2d (i, j)); // -w-tree-1
-                    } else if (n < 72) {
-                        tiles[i, j] = Library.HashedTiles["field"].Create (new Point2d (i, j)); // -w-corpse-1
-                    } else if (n < 73) {
-                        tiles[i, j] = Library.HashedTiles["field"].Create (new Point2d (i, j), (i + j) % 3);
+                    if (n < 11) {
+                        tiles[i, j] = Library.HashedTiles["field"].Create (new MapPoint (i, j)); // -w-tree-1
+                    } else if (n < 12) {
+                        tiles[i, j] = Library.HashedTiles["field"].Create (new MapPoint (i, j)); // -w-corpse-1
+                    } else if (n < 13) {
+                        tiles[i, j] = Library.HashedTiles["field"].Create (new MapPoint (i, j, (i + j) % 5));
                     } else {
                         var rx = Math.Max (0, i - 1);
                         var ry = Math.Max (0, j - 1);
 
-                        if (tiles[rx, j] != null && tiles[rx, j].Level > 0) {
-                            tiles[i, j] = Library.HashedTiles["ramp-w-1"].Create (new Point2d (i, j), tiles[rx, j].Level - 1);
-                        } else if (tiles[i, ry] != null && tiles[i, ry].Level > 0) {
-                            tiles[i, j] = Library.HashedTiles["ramp-n-1"].Create (new Point2d (i, j), tiles[i, ry].Level - 1);
+                        if (tiles[rx, j] != null && tiles[rx, j].MapCoords.level > 0) {
+                            tiles[i, j] = Library.HashedTiles["ramp-w-1"].Create (new MapPoint (i, j, tiles[rx, j].MapCoords.level - 1));
+                        } else if (tiles[i, ry] != null && tiles[i, ry].MapCoords.level > 0) {
+                            tiles[i, j] = Library.HashedTiles["ramp-n-1"].Create (new MapPoint (i, j, tiles[i, ry].MapCoords.level - 1));
                         } else {
-                            tiles[i, j] = Library.HashedTiles["field"].Create (new Point2d (i, j));
+                            tiles[i, j] = Library.HashedTiles["field"].Create (new MapPoint (i, j));
+
+                            if (!putPlayer) {
+                                markers.Add (Library.HashedMarkers["player-1"].Create (new MapPoint (i, j)));
+                                putPlayer = true;
+                            }
                         }
                     }
                 }
+            }
+ 
+            while(lights1Count-- > 0) {
+                i = rnd.Next (0, mapSize.width);
+                j = rnd.Next (0, mapSize.height);
+
+                var tile = tiles[i, j];
+
+                markers.Add (Library.HashedMarkers["light-1"].Create (new MapPoint (i, j, tile.MapCoords.level)));
+
+                tile.TileType = MapTileType.Wall;
+            }
+
+            while(lights2Count-- > 0) {
+                i = rnd.Next (0, mapSize.width);
+                j = rnd.Next (0, mapSize.height);
+
+                var tile = tiles[i, j];
+
+                markers.Add (Library.HashedMarkers["light-2"].Create (new MapPoint (i, j, tile.MapCoords.level)));
+
+                tile.TileType = MapTileType.Wall;
+            }
+
+            while(treesCount-- > 0) {
+                i = rnd.Next (0, mapSize.width);
+                j = rnd.Next (0, mapSize.height);
+
+                var tile = tiles[i, j];
+
+                markers.Add (Library.HashedMarkers["tree-1"].Create (new MapPoint (i, j, tile.MapCoords.level)));
+
+                tile.TileType = MapTileType.Wall;
             }
 
             return new MapBuildResult (tiles, markers);

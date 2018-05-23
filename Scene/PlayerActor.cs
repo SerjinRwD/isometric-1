@@ -6,10 +6,10 @@ namespace isometric_1.Scene {
 
     public class PlayerActor : AbstractActor {
 
-        public Stack<Point2d> CurrentPath { get; protected set; }
-        private Point2d _currentWaypoint;
-        private Direction _currentDirection;
+        public Stack<MapPoint> CurrentPath { get; protected set; }
+        private MapPoint _currentWaypoint;
         private Point3d _nextPosition;
+        private bool _needSort = false;
 
         public override void OnMouseDown (object sender, ManagedSdl.SdlMouseButtonEventArgs args) {
             if (GenericState == ActorGenericState.Waiting) {
@@ -20,7 +20,7 @@ namespace isometric_1.Scene {
 
                 if (tile != null) {
                     GenericState = ActorGenericState.CheckPath;
-                    Destination = tile.MapPosition;
+                    Destination = tile.MapCoords;
                 }
 
             }
@@ -45,8 +45,8 @@ namespace isometric_1.Scene {
 
                     if (CurrentPath.Count > 0) {
                         _currentWaypoint = CurrentPath.Pop ();
-                        _nextPosition = new Point3d (_currentWaypoint.x, 0, _currentWaypoint.y, SceneContext.Current.Map.TileSize);
-                        _currentDirection = Compute.DirectionBetweenPoints (MapPosition, _currentWaypoint);
+                        _nextPosition = _currentWaypoint.ToPoint3d (SceneContext.Current.Map.TileSize);
+                        Direction = Compute.DirectionBetweenPoints (MapPosition, _currentWaypoint);
 
                         GenericState = ActorGenericState.MovingToWaypoint;
                     } else {
@@ -61,21 +61,30 @@ namespace isometric_1.Scene {
                     var d = Compute.ManhattanDistance (Position.ToPoint2d (false), _nextPosition.ToPoint2d (false));
 
                     if (d <= (SceneContext.Current.Map.TileSize.width >> 4)) {
-                        Position = new Point3d (_currentWaypoint.x, 0, _currentWaypoint.y, SceneContext.Current.Map.TileSize);
+                        Position = _currentWaypoint.ToPoint3d (SceneContext.Current.Map.TileSize);
                         GenericState = ActorGenericState.CheckPath;
                     } else {
-                        Position = Compute.StepToDirection (Position, _currentDirection, 1);
+                        Position = Compute.StepToDirection (Position, Direction, 1);
                     }
+
+                    _needSort = true;
+
                     break;
             }
 
-            var tile = SceneContext.Current.Map.Tiles[_currentWaypoint.x, _currentWaypoint.y];
+            var tile = SceneContext.Current.Map.Tiles[_currentWaypoint.column, _currentWaypoint.row];
             Position = new Point3d (Position.x, tile.GetYForActor (this), Position.z);
             IsometricPosition = Compute.Isometric (Position);
             RegistrationPoint = Compute.Isometric (Position + (Image.RegistrationX, 0, Image.RegistrationY));
-            SceneContext.Current.Rendering.Sort (RenderingList.Comparer);
+
+            if (_needSort) {
+                var id = SceneContext.Current.Rendering.IndexOf(this);
+                SceneContext.Current.Rendering.Sort (id, 10, RenderingList.Comparer);
+
+                _needSort = false;
+            }
         }
 
-        public PlayerActor (Point2d mapPosition, ImageTile image) : base (mapPosition, image) { }
+        public PlayerActor (MapPoint mapPosition, ImageTile image) : base (mapPosition, image) { }
     }
 }

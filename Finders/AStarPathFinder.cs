@@ -1,4 +1,4 @@
-namespace isometric_1.PathFinder {
+namespace isometric_1.Finders {
     using System.Collections.Generic;
     using System.Linq;
     using System;
@@ -25,22 +25,22 @@ namespace isometric_1.PathFinder {
             Nodes = map.Tiles;
         }
 
-        public Stack<Point2d> Find (Point2d start, Point2d end) {
-            return start == end ? new Stack<Point2d>(new Point2d[] { end }) : Finding (start, end) ? Trace (start, end) : null;
+        public Stack<MapPoint> Find (MapPoint start, MapPoint end) {
+            return start == end ? new Stack<MapPoint>(new MapPoint[] { end }) : Finding (start, end) ? Trace (start, end) : null;
         }
 
-        private Stack<Point2d> Trace (Point2d start, Point2d end) {
+        private Stack<MapPoint> Trace (MapPoint start, MapPoint end) {
 
-            var result = new Stack<Point2d>();
+            var result = new Stack<MapPoint>();
 
-            var current = Nodes[end.x, end.y];
-            result.Push(current.MapPosition);
+            var current = Nodes[end.column, end.row];
+            result.Push(current.MapCoords);
 
             var neighboring = current.Neighbors.Values.Where(p => p.closed); //.OrderBy(s => s.f);
             var min = neighboring.Min(s => s.g);
             current = neighboring.FirstOrDefault(p => p.g == min);
 
-            result.Push(current.MapPosition);
+            result.Push(current.MapCoords);
 
             MapTile next = null;
 
@@ -54,14 +54,14 @@ namespace isometric_1.PathFinder {
                     break;
                 }
 
-                result.Push(next.MapPosition);
+                result.Push(next.MapCoords);
                 current = next;
             }
 
             return result;
         }
 
-        private bool Finding (Point2d start, Point2d end) {
+        private bool Finding (MapPoint start, MapPoint end) {
 
             if (IsBusy) {
                 throw new InvalidOperationException ($"{nameof(AStarPathFinder)} is busy!");
@@ -75,11 +75,11 @@ namespace isometric_1.PathFinder {
                 }
             }
 
-            Func<Point2d, Point2d, int> heuristics = Compute.ManhattanDistance; // Compute.EuclideanDistance; // Compute.ChebyshevDistance; // 
+            Func<MapPoint, MapPoint, int> heuristics = Compute.ManhattanDistance; // Compute.EuclideanDistance; // Compute.ChebyshevDistance; // 
 
             var q = new Dictionary<int, MapTile> (); // вершины, которые требуется просмотреть
 
-            var current = Nodes[start.x, start.y];
+            var current = Nodes[start.column, start.row];
             current.g = 0;
             current.f = current.g + heuristics (start, end);
 
@@ -110,7 +110,7 @@ namespace isometric_1.PathFinder {
 
                     if (!neighbor.closed || tentativeScore < neighbor.g) {
                         neighbor.g = tentativeScore;
-                        neighbor.f = neighbor.g + heuristics (neighbor.MapPosition, end);
+                        neighbor.f = neighbor.g + heuristics (neighbor.MapCoords, end);
 
                         if (!q.ContainsKey (neighbor.Id)) {
                             q.Add (neighbor.Id, neighbor);

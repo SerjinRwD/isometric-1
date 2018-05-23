@@ -75,6 +75,12 @@
                         WallSouthId = 1,
                         WallNorthId = ImageTile.NOT_SET,
                     }
+                },
+                Markers = new Marker[] {
+                    new Marker {
+                        Type = "hero-1",
+                        ImageId = 0
+                    }
                 }
             };
 

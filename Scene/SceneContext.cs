@@ -3,7 +3,8 @@ namespace isometric_1.Scene {
 
     using isometric_1.Builders;
     using isometric_1.Contract;
-    using isometric_1.PathFinder;
+    using isometric_1.ManagedSdl;
+    using isometric_1.Finders;
     using isometric_1.Types;
 
     public sealed class SceneContext : IUpdateable {
@@ -39,13 +40,35 @@ namespace isometric_1.Scene {
 
             SceneContext.Current.Map.Markers?.ForEach (m => {
                 if (m.Type == "player-1") {
-                    var p = new PlayerActor (m.MapPosition, SceneContext.Current.TileSet.Tiles[0]);
+                    var p = new PlayerActor (m.MapPosition, SceneContext.Current.Map.TileSet.Tiles[m.ImageId]);
                     SceneContext.Current.Actors.Add (p);
                     SceneContext.Current.Viewport.Position = Compute.Isometric (p.Position).ToPoint2d () - (0, SceneContext.Current.Viewport.Size.height >> 1);
 
                     SceneContext.Current.Rendering.Add(p);
                 }
+
+                if (m.Type == "light-1") {
+                    var d = new Decoration (m.MapPosition, SceneContext.Current.Map.TileSet.Tiles[m.ImageId]);
+
+                    SceneContext.Current.Rendering.Add(d);
+                    SceneContext.Current.Map.LocalLights.Add(new Lighting(m.MapPosition, SdlColorFactory.FromRGB("#f5e7a7"), 255));
+                }
+
+                if (m.Type == "light-2") {
+                    var d = new Decoration (m.MapPosition, SceneContext.Current.Map.TileSet.Tiles[m.ImageId]);
+
+                    SceneContext.Current.Rendering.Add(d);
+                    SceneContext.Current.Map.LocalLights.Add(new Lighting(m.MapPosition, SdlColorFactory.FromRGB("#ff4747"), 255));
+                }
+
+                if (m.Type == "tree-1") {
+                    var d = new Decoration (m.MapPosition, SceneContext.Current.Map.TileSet.Tiles[m.ImageId]);
+
+                    SceneContext.Current.Rendering.Add(d);
+                }
             });
+
+            SceneContext.Current.Map.RecalculateLightings ();
 
             SceneContext.Current.Map.BypassTiles((tiles, i, j) => {
                 SceneContext.Current.Rendering.Add(tiles[i, j]);

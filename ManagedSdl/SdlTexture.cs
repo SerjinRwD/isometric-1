@@ -5,6 +5,54 @@ namespace isometric_1.ManagedSdl {
     public class SdlTexture : IDisposable {
         public IntPtr Pointer { get; private set; }
 
+        public byte AlphaMod
+        {
+            get
+            {
+                byte a;
+
+                if (SDL.SDL_GetTextureAlphaMod(Pointer, out a) < 0) {
+                    throw new SdlException(nameof(ColorMod));
+                }
+
+                return a;
+            }
+
+            set => SDL.SDL_SetTextureAlphaMod(Pointer, value);
+        }
+
+        public (byte, byte, byte) ColorMod
+        {
+            get
+            {
+                byte r, g, b;
+
+                if (SDL.SDL_GetTextureColorMod(Pointer, out r, out g, out b) < 0) {
+                    throw new SdlException(nameof(ColorMod));
+                }
+
+                return (r, g, b);
+            }
+
+            set => SDL.SDL_SetTextureColorMod(Pointer, value.Item1, value.Item2, value.Item3);
+        }
+
+        public SDL.SDL_BlendMode BlendMode
+        {
+            get
+            {
+                SDL.SDL_BlendMode blend;
+                
+                if (SDL.SDL_GetTextureBlendMode(Pointer, out blend) < 0) {
+                    throw new SdlException(nameof(BlendMode));
+                }
+
+                return blend;
+            }
+
+            set => SDL.SDL_SetTextureBlendMode(Pointer, value);
+        }
+
         private SdlTexture () { }
 
         public void Dispose () {

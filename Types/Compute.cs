@@ -87,9 +87,17 @@ namespace isometric_1.Types {
         public static int ManhattanDistance (Point2d from, Point2d to) {
             return Math.Abs (to.x - from.x) + Math.Abs (to.y - from.y);
         }
+        
+        public static int ManhattanDistance (MapPoint from, MapPoint to) {
+            return Math.Abs (to.column - from.column) + Math.Abs (to.row - from.row);
+        }
 
         public static int ChebyshevDistance (Point2d from, Point2d to) {
             return Math.Max (Math.Abs (from.x - to.x), Math.Abs (from.y - to.y));
+        }
+
+        public static int ChebyshevDistance (MapPoint from, MapPoint to) {
+            return Math.Max (Math.Abs (from.column - to.column), Math.Abs (from.row - to.row));
         }
 
         public static int EuclideanDistance (Point2d from, Point2d to) {
@@ -97,6 +105,20 @@ namespace isometric_1.Types {
             var dy = from.y - to.y;
 
             return (int) Math.Sqrt (dx * dx + dy * dy);
+        }
+
+        public static int EuclideanDistance (MapPoint from, MapPoint to) {
+            var dx = from.column - to.column;
+            var dy = from.row - to.row;
+
+            return (int) Math.Sqrt (dx * dx + dy * dy);
+        }
+
+        public static Direction DirectionBetweenPoints (MapPoint from, MapPoint to) {
+            var dx = Math.Sign (to.column - from.column) + 1;
+            var dy = Math.Sign (to.row - from.row) + 1;
+
+            return _directionMatrix[dx, dy];
         }
 
         public static Direction DirectionBetweenPoints (Point2d from, Point2d to) {

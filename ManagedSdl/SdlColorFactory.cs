@@ -28,9 +28,15 @@ namespace isometric_1.ManagedSdl {
             return c;
         }
 
+        public static SDL.SDL_Color FromRGB((byte, byte, byte) rgb)
+        {
+            return FromRGBA(rgb.Item1, rgb.Item2, rgb.Item3, 255);
+        }
+
         public static SDL.SDL_Color FromRGB (byte r, byte g, byte b) {
             return FromRGBA(r, g, b, 255);
         }
+        
         public static SDL.SDL_Color FromRGBA (byte r, byte g, byte b, byte a) {
 
             var c = new SDL.SDL_Color ();

@@ -1,4 +1,4 @@
-namespace isometric_1.PathFinder
+namespace isometric_1.Finders
 {
     using System.Collections.Generic;
     using isometric_1.Scene;
@@ -6,6 +6,6 @@ namespace isometric_1.PathFinder
 
     public interface IPathFinder
     {
-        Stack<Point2d> Find(Point2d start, Point2d end);
+        Stack<MapPoint> Find(MapPoint start, MapPoint end);
     }
 }

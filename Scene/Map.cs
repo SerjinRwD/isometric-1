@@ -4,6 +4,7 @@ namespace isometric_1.Scene {
 
     using isometric_1.Builders;
     using isometric_1.Contract;
+    using isometric_1.Finders;
     using isometric_1.Helpers;
     using isometric_1.Types;
 
@@ -16,6 +17,8 @@ namespace isometric_1.Scene {
         public MapTile[, ] Tiles { get; private set; }
         public Dictionary<Point2d, MapTile> Hash { get; private set; }
         public List<Marker> Markers { get; private set; }
+        public Lighting GlobalLight { get; private set; }
+        public List<Lighting> LocalLights { get; private set; }
         private int _precalculatedCellWidthHalf;
         private int _precalculatedCellLengthHalf;
         private int _precalculatedCellLengthQuarter;
@@ -45,6 +48,8 @@ namespace isometric_1.Scene {
             BypassTiles ((i, j) => {
                 Tiles[i, j] = new MapTile (i, j);
             });
+
+            LocalLights = new List<Lighting> ();
         }
 
         public Map (Size2d mapSize, IMapBuilder builder) {
@@ -56,15 +61,18 @@ namespace isometric_1.Scene {
             Tiles = result.Tiles;
             TileSet = builder.TileSet;
             TileSize = builder.TileSize;
+            GlobalLight = builder.GlobalLight;
 
             _precalculatedCellWidthHalf = TileSize.width >> 1;
             _precalculatedCellLengthHalf = TileSize.length >> 1;
             _precalculatedCellLengthQuarter = TileSize.length >> 2;
 
-            Hash = new Dictionary<Point2d, MapTile> ();
+            LocalLights = new List<Lighting> ();
+            //Hash = new Dictionary<Point2d, MapTile> ();
         }
 
         public void Init () {
+            /*
             BypassTiles ((i, j) => {
                 var cell = Tiles[i, j];
                 var key = cell.IsometricPosition.ToPoint2d ();
@@ -76,6 +84,7 @@ namespace isometric_1.Scene {
                     //Console.WriteLine ($"hash: {key}");
                 }
             });
+            */
 
             BypassTiles ((i, j) => {
                 Tiles[i, j].RecalculateNeighbors ();
@@ -105,6 +114,25 @@ namespace isometric_1.Scene {
             if (mapY >= MapSize.height) { mapY = MapSize.height - 1; }
 
             return Tiles[mapX, mapY];
+        }
+
+        public void RecalculateLightings () {
+            BypassTiles ((i, j) => {
+                var t = Tiles[i, j];
+
+                t.Light = GlobalLight.ToMapTileLight ();
+
+                foreach (var l in LocalLights) {
+
+                    var result = ObstacleFinder.Check (this, Tiles[l.mapPosition.column, l.mapPosition.row], t);
+
+                    if (result.IsGoalAchieved) {
+                        var intensity = (byte)(l.intensity / (Compute.EuclideanDistance (new MapPoint (i, j), l.mapPosition) + 1));
+
+                        t.Light = t.Light.Blend(l.color, intensity); // new MapTileLight (l.color /*t.Light.color*/, (byte) Math.Min (255, (t.Light.intensity + intensity))); // * (255 - t.light)));
+                    }
+                }
+            });
         }
     }
 }

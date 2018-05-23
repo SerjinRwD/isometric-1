@@ -4,7 +4,7 @@ namespace isometric_1.SdlProgram {
 
     using isometric_1.Helpers;
     using isometric_1.ManagedSdl;
-    using isometric_1.PathFinder;
+    using isometric_1.Finders;
     using isometric_1.Scene;
     using isometric_1.Types;
 
@@ -29,17 +29,20 @@ namespace isometric_1.SdlProgram {
         SDL.SDL_Color _colorStart = SdlColorFactory.FromRGB ("#afaf44");
         SDL.SDL_Color _colorEnd = SdlColorFactory.FromRGB ("#90ff90");
         SDL.SDL_Color _colorPoint = SdlColorFactory.FromRGB ("#ffff0f");
+        SDL.SDL_Color _colorRed = SdlColorFactory.FromRGB ("#ff0000");
+        SDL.SDL_Color _colorGreen = SdlColorFactory.FromRGB ("#00ff00");
 
-        Point2d _startPoint;
-        Point2d _endPoint;
-        Point2d _cursorOnMap;
+        MapPoint _startPoint;
+        MapPoint _endPoint;
+        ObstacleFinder.Result _obstacleCheck;
+        MapPoint _cursorOnMap;
         SdlFont _font;
 
         InsertMode _insertMode;
         bool _doInsert;
         bool _quit;
 
-        List<Point2d> _path;
+        List<MapPoint> _path;
 
         public override void Init () {
             base.Init ();
@@ -90,7 +93,7 @@ namespace isometric_1.SdlProgram {
 
             emitter.MouseDown += (s, a) => _doInsert = true;
             emitter.MouseUp += (s, a) => _doInsert = false;
-            emitter.MouseMotion += (s, a) => _cursorOnMap = new Point2d (a.MouseMotionEvent.x / _cellSize, a.MouseMotionEvent.y / _cellSize);
+            emitter.MouseMotion += (s, a) => _cursorOnMap = new MapPoint (a.MouseMotionEvent.x / _cellSize, a.MouseMotionEvent.y / _cellSize);
 
             while (!_quit) {
                 emitter.Poll ();
@@ -129,7 +132,13 @@ namespace isometric_1.SdlProgram {
                         _endPoint = _cursorOnMap;
                         var stack = SceneContext.Current.PathFinder.Find (_startPoint, _endPoint);
                         stack.Push(_startPoint);
-                        _path = new List<Point2d>(stack.ToArray());
+                        _path = new List<MapPoint>(stack.ToArray());
+
+                        _obstacleCheck = ObstacleFinder.Check(
+                            SceneContext.Current.Map,
+                            SceneContext.Current.Map.Tiles[_startPoint.column, _startPoint.row],
+                            SceneContext.Current.Map.Tiles[_endPoint.column, _endPoint.row]);
+
                         break;
 
                     case InsertMode.PutWall:
@@ -160,11 +169,11 @@ namespace isometric_1.SdlProgram {
 
             // start
             Renderer.SetDrawColor (_colorStart);
-            Renderer.DrawRect (_startPoint.x * _cellSize, _startPoint.y * _cellSize, _cellSize, _cellSize, true);
+            Renderer.DrawRect (_startPoint.column * _cellSize, _startPoint.row * _cellSize, _cellSize, _cellSize, true);
 
             // end
             Renderer.SetDrawColor (_colorEnd);
-            Renderer.DrawRect (_endPoint.x * _cellSize, _endPoint.y * _cellSize, _cellSize, _cellSize, true);
+            Renderer.DrawRect (_endPoint.column * _cellSize, _endPoint.row * _cellSize, _cellSize, _cellSize, true);
 
             // grid
             Renderer.SetDrawColor (_colorGrid);
@@ -220,7 +229,16 @@ namespace isometric_1.SdlProgram {
                 var _prev = _path[i - 1];
                 var _cur = _path[i];
 
-                Renderer.DrawLine (_prev * (_cellSize, _cellSize) + (_cellSize / 2, _cellSize / 2), _cur * (_cellSize, _cellSize) + (_cellSize / 2, _cellSize / 2));
+                Renderer.DrawLine (_prev.ToPoint2d (_cellSize) + (_cellSize / 2, _cellSize / 2), _cur.ToPoint2d (_cellSize) + (_cellSize / 2, _cellSize / 2));
+            }
+
+            Renderer.SetDrawColor (_obstacleCheck.IsGoalAchieved ? _colorGreen : _colorRed);
+            Renderer.DrawLine (_startPoint.ToPoint2d (_cellSize) + (_cellSize / 2, _cellSize / 2), _endPoint.ToPoint2d (_cellSize) + (_cellSize / 2, _cellSize / 2));
+
+            if(!_obstacleCheck.IsGoalAchieved) {
+                (var x, var y) = _obstacleCheck.ObstaclePosition.ToPoint2d (_cellSize) + (_cellSize / 2 - 2, _cellSize / 2 - 2);
+
+                Renderer.DrawRect(x, y, 4, 4, true);
             }
         }
     }

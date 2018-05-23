@@ -5,7 +5,14 @@
   <TileSize width="52" length="52" height="27" />
   <Tiles>
     <MapTilePrototype Name="field"    Type="Floor" Orientation="N" FloorId="0" WallSouthId="2" WallNorthId="7" />
-    <MapTilePrototype Name="ramp-n-1" Type="Ramp"  Orientation="N" FloorId="5" WallSouthId="2" WallNorthId="7" />
-    <MapTilePrototype Name="ramp-w-1" Type="Ramp"  Orientation="W" FloorId="6" WallSouthId="2" WallNorthId="7" />
+    <MapTilePrototype Name="ramp-n-1" Type="Slope" Orientation="N" FloorId="5" WallSouthId="2" WallNorthId="7" />
+    <MapTilePrototype Name="ramp-w-1" Type="Slope" Orientation="W" FloorId="6" WallSouthId="2" WallNorthId="7" />
   </Tiles>
+  <Markers>
+    <Marker Type="player-1" ImageId="9" />
+    <Marker Type="light-1"  ImageId="8" />
+    <Marker Type="light-2"  ImageId="10" />
+    <Marker Type="tree-1"   ImageId="3" />
+    <Marker Type="corpse-1" ImageId="4" />
+  </Markers>
 </MapTilePrototypeLibrary>

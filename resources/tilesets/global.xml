@@ -4,9 +4,13 @@
   <Description>Тайлсет глобального уровня: персонажи, UI</Description>
   <BitmapFile>global.bmp</BitmapFile>
   <Tiles>
-    <ImageTile OrderId="0" OffsetX="0"  OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" RegistrationX="54" RegistrationY="54" />
-    <ImageTile OrderId="1" OffsetX="54" OffsetY="0" Width="54" Height="54" OriginX="27" OriginY="39" />
-    <ImageTile OrderId="2" OffsetX="0"  OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
-    <ImageTile OrderId="3" OffsetX="54" OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="0" Name="hero"         OffsetX="0"   OffsetY="0"  Width="54" Height="54" OriginX="27" OriginY="39" RegistrationX="54" RegistrationY="54" />
+    <ImageTile OrderId="1" Name="selection-f"  OffsetX="54"  OffsetY="0"  Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="2" Name="selection-sn" OffsetX="0"   OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="3" Name="selection-sw" OffsetX="54"  OffsetY="54" Width="54" Height="54" OriginX="27" OriginY="39" />
+    <ImageTile OrderId="4" Name="edge-fw"      OffsetX="110" OffsetY="0"  Width="27" Height="14" OriginX="27" OriginY="13" />
+    <ImageTile OrderId="5" Name="edge-fn"      OffsetX="137" OffsetY="0"  Width="27" Height="14" OriginX="0"  OriginY="13" />
+    <ImageTile OrderId="6" Name="edge-sw"      OffsetX="108" OffsetY="14" Width="29" Height="41" OriginX="27" OriginY="41" />
+    <ImageTile OrderId="7" Name="edge-sn"      OffsetX="137" OffsetY="14" Width="29" Height="41" OriginX="2"  OriginY="41" />
   </Tiles>
 </ImageTileSetMetadata>

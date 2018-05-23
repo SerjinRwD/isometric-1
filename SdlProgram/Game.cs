@@ -26,7 +26,7 @@ namespace isometric_1.SdlProgram {
             var library = MapTilePrototypeLibrary.Load (Resources.GetFilePath ("libraries", "demo.xml"), Renderer);
 
             SceneContext.Init (
-                new Size2d (32, 32), new Size2d (Window.Size.width, Window.Size.height), tileset, new Demo1MapBuilder (library)); // new PyramidMapBuilder (library)); // 
+                new Size2d (128, 128), new Size2d (Window.Size.width, Window.Size.height), tileset, new Demo1MapBuilder (library)); // new PyramidMapBuilder (library)); // 
 
             var emitter = new SdlEventEmitter ();
 
@@ -59,8 +59,8 @@ namespace isometric_1.SdlProgram {
                 SceneContext.Current.Rendering.ForEach(r => r.Render (Renderer, SceneContext.Current.Viewport));
                 //SceneContext.Current.Map.BypassTiles((tiles, i, j) => tiles[i, j].Render (Renderer, SceneContext.Current.Viewport));
 
-                Renderer.SetDrawColor (255, 255, 55, 255);
-                Renderer.DrawText($"GC.TotalMemory: {(System.GC.GetTotalMemory(false))}", 16, 16, font);
+                //Renderer.SetDrawColor (255, 255, 55, 255);
+                //Renderer.DrawText($"GC.TotalMemory: {(System.GC.GetTotalMemory(false))}", 16, 16, font);
 
                 Renderer.Present ();
             }

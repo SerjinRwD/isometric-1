@@ -25,9 +25,9 @@ namespace isometric_1.Scene {
         [XmlAttribute]
         public int WallNorthId { get; set; }
 
-        public MapTile Create (Point2d mapPosition, int level = 0) {
+        public MapTile Create (MapPoint mapPosition) {
             return new MapTile (
-                mapPosition, level, Library.TileSize, Type,
+                mapPosition, Library.TileSize, Type,
                 Library.TileSet.Tiles[FloorId], Library.TileSet.Tiles[WallSouthId], Library.TileSet.Tiles[WallNorthId],
                 Orientation);
         }

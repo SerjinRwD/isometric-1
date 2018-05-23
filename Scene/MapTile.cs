@@ -7,11 +7,12 @@ namespace isometric_1.Scene {
     using isometric_1.Helpers;
     using isometric_1.ManagedSdl;
     using isometric_1.Types;
+    using SDL2;
 
     public enum MapTileType {
         Floor,
         Wall,
-        Ramp
+        Slope
     }
 
     public class MapTile : IRenderable {
@@ -34,14 +35,17 @@ namespace isometric_1.Scene {
 
         public Dictionary<Direction, int> Egdes { get; private set; }
         public Dictionary<Direction, MapTile> Neighbors { get; private set; }
-        public Point2d MapPosition { get; private set; }
-        public int Level { get; set; }
+        public MapPoint MapCoords { get; private set; }
         public MapTileType TileType { get; set; }
         public Direction Orientation { get; set; }
         public AbstractActor Visitor { get; set; }
         public bool IsEmpty { get => TileType != MapTileType.Wall && Visitor == null; }
         public bool IsSelected { get; set; }
         public object Tag { get; set; }
+
+        #region Освещенность
+        public MapTileLight Light { get; set; }
+        #endregion
 
         private MapTile () {
             _id = _lastIndex++;
@@ -58,8 +62,7 @@ namespace isometric_1.Scene {
         /// <param name="blockId"></param>
         /// <param name="decorationIds"></param>
         public MapTile (
-            Point2d mapPosition,
-            int level,
+            MapPoint mapPosition,
             Size3d tileSize,
             MapTileType type,
             ImageTile image,
@@ -70,11 +73,10 @@ namespace isometric_1.Scene {
             Image = image;
             WallSouth = southImage;
             WallNorth = northImage;
-            var position = new Point2d (mapPosition.x * tileSize.width + Image.RegistrationX, mapPosition.y * tileSize.length + Image.RegistrationY - Level * tileSize.height);
+            var position = mapPosition.ToPoint2d(tileSize) + (Image.RegistrationX, Image.RegistrationY);
 
-            MapPosition = mapPosition;
-            Level = level;
-            IsometricPosition = Compute.Isometric (mapPosition.x, Level, mapPosition.y, tileSize);
+            MapCoords = mapPosition;
+            IsometricPosition = Compute.Isometric (mapPosition.ToPoint3d (tileSize));
             RegistrationPoint = Compute.Isometric (position);
             TileType = type;
             Orientation = orientation;
@@ -88,33 +90,43 @@ namespace isometric_1.Scene {
         /// <param name="my"></param>
         /// <param name="cellSize"></param>
         public MapTile (int mx, int my) : this () {
-            MapPosition = new Point2d (mx, my);
+            MapCoords = new MapPoint (mx, my);
         }
 
         public int GetYForActor (AbstractActor actor) {
             var tileSize = SceneContext.Current.Map.TileSize;
-            var position = new Point3d (MapPosition.x, Level, MapPosition.y, tileSize) + (tileSize.width, 0, tileSize.length);
 
             switch (TileType) {
 
                 case MapTileType.Floor:
-                    return position.y;
+                    return MapCoords.level * tileSize.height;
 
-                case MapTileType.Ramp:
+                case MapTileType.Slope:
+                    var tile = this;//Neighbors[actor.Direction];
+                    Point3d position;
+
                     switch (Orientation) {
                         case Direction.N:
+                            position = actor.Direction == Direction.N
+                                ? MapCoords.ToPoint3d(tileSize)
+                                : MapCoords.ToPoint3d(tileSize) + (tileSize.width, 0, tileSize.length);
+
                             var rz = actor.Position.z - position.z;
-                            return position.y - (rz >> 1);
+                            return MapCoords.level * tileSize.height - (rz >> 1);
 
                         case Direction.W:
+                            position = actor.Direction == Direction.W
+                                ? MapCoords.ToPoint3d(tileSize) + (tileSize.width, 0, tileSize.length)
+                                : MapCoords.ToPoint3d(tileSize);
+
                             var rx = actor.Position.x - position.x;
-                            return position.y - (rx >> 1);
+                            return MapCoords.level * tileSize.height - (rx >> 1);
 
                         default:
                             return 0;
                     }
                 case MapTileType.Wall:
-                    return position.y;
+                    return MapCoords.level * tileSize.height;
 
                 default:
                     return 0;
@@ -126,15 +138,15 @@ namespace isometric_1.Scene {
             closed = false;
         }
 
-        public bool IsMath (Point2d point) {
-            return MapPosition.x == point.x && MapPosition.y == point.y;
+        public bool IsMath (MapPoint point) {
+            return MapCoords.column == point.column && MapCoords.row == point.row;
         }
 
         public void RecalculateNeighbors () {
             Neighbors = new Dictionary<Direction, MapTile> ();
             Egdes = new Dictionary<Direction, int> ();
 
-            (int x, int y) = MapPosition;
+            (int x, int y) = MapCoords;
             int rx, ry;
 
             for (var i = -1; i < 2; i++) {
@@ -163,7 +175,7 @@ namespace isometric_1.Scene {
                 return 255;
             }
 
-            return 1 + Math.Abs (Level - neighbor.Level) * 2;
+            return 1 + Math.Abs (MapCoords.level - neighbor.MapCoords.level) * 2;
         }
 
         public void RecalculateEdges () {
@@ -179,16 +191,26 @@ namespace isometric_1.Scene {
         }
 
         public void Render (SdlRenderer renderer, Viewport viewport) {
+            int resultIsoX = IsometricPosition.x - viewport.Position.x + (viewport.Size.width >> 1);
+            int resultIsoY = IsometricPosition.z - viewport.Position.y;
+
+            if(resultIsoX < 0 ||
+               resultIsoY < 0 ||
+               resultIsoX > viewport.Size.width || 
+               resultIsoY > viewport.Size.height) {
+                return;
+            } 
+
             ImageTile imageTile;
             var tileSet = SceneContext.Current.Map.TileSet;
             var tileSize = SceneContext.Current.Map.TileSize;
 
             var texture = tileSet.Texture;
-            int resultIsoX = IsometricPosition.x - viewport.Position.x + (viewport.Size.width >> 1);
-            int resultIsoY = IsometricPosition.z - viewport.Position.y;
 
-            if (WallSouth != null && Level > 0) {
-                for (var i = 0; i < Level; i++) {
+            texture.ColorMod = Light.modulatedColor; // (Light.intensity, Light.intensity, Light.intensity);(255, 0, 0); // 
+
+            if (WallSouth != null && MapCoords.level > 0) {
+                for (var i = 0; i < MapCoords.level; i++) {
                     renderer.RenderTexture (
                         texture,
                         resultIsoX - WallSouth.OriginX, resultIsoY - (i + 1) * tileSize.height - WallSouth.OriginY,
@@ -196,8 +218,8 @@ namespace isometric_1.Scene {
                 }
             }
 
-            if (WallNorth != null && Level > 0) {
-                for (var i = 0; i < Level; i++) {
+            if (WallNorth != null && MapCoords.level > 0) {
+                for (var i = 0; i < MapCoords.level; i++) {
                     renderer.RenderTexture (
                         texture,
                         resultIsoX - WallNorth.OriginX, resultIsoY - (i + 1) * tileSize.height - WallNorth.OriginY,
@@ -207,14 +229,69 @@ namespace isometric_1.Scene {
 
             if (Image != null) {
 
+                /* отрисовка тайла */
                 renderer.RenderTexture (
                     Image.Texture,
                     resultIsoX - Image.OriginX, resultIsoY - IsometricPosition.y - Image.OriginY,
                     Image.GetClipRect ());
+
+                SceneContext.Current.TileSet.Texture.AlphaMod = 76;
+
+                /* отрисовка граней */
+                // грани склона
+                if(TileType == MapTileType.Slope)
+                {
+                    if(Neighbors.ContainsKey(Direction.W) && Neighbors[Direction.W].MapCoords.level <= MapCoords.level)
+                    {
+                        imageTile = SceneContext.Current.TileSet.Tiles[6];
+
+                        renderer.RenderTexture (
+                            SceneContext.Current.TileSet.Texture,
+                            resultIsoX - imageTile.OriginX, resultIsoY - IsometricPosition.y - imageTile.OriginY,
+                            imageTile.GetClipRect ());
+                    }
+
+                    if(Neighbors.ContainsKey(Direction.S) && Neighbors[Direction.S].MapCoords.level <= MapCoords.level)
+                    {
+                        imageTile = SceneContext.Current.TileSet.Tiles[7];
+
+                        renderer.RenderTexture (
+                            SceneContext.Current.TileSet.Texture,
+                            resultIsoX - imageTile.OriginX, resultIsoY - IsometricPosition.y - imageTile.OriginY,
+                            imageTile.GetClipRect ());
+                    }
+                }
+                // грани плоскости
+                else
+                {
+                    if(Neighbors.ContainsKey(Direction.W) && Neighbors[Direction.W].MapCoords.level < MapCoords.level)
+                    {
+                        imageTile = SceneContext.Current.TileSet.Tiles[4];
+
+                        renderer.RenderTexture (
+                            SceneContext.Current.TileSet.Texture,
+                            resultIsoX - imageTile.OriginX, resultIsoY - IsometricPosition.y - imageTile.OriginY,
+                            imageTile.GetClipRect ());
+                    }
+
+                    if(Neighbors.ContainsKey(Direction.S) && Neighbors[Direction.S].MapCoords.level < MapCoords.level)
+                    {
+                        imageTile = SceneContext.Current.TileSet.Tiles[5];
+
+                        renderer.RenderTexture (
+                            SceneContext.Current.TileSet.Texture,
+                            resultIsoX - imageTile.OriginX, resultIsoY - IsometricPosition.y - imageTile.OriginY,
+                            imageTile.GetClipRect ());
+                    }
+                }
+
+                SceneContext.Current.TileSet.Texture.AlphaMod = 255;
             }
 
+            texture.ColorMod = (255, 255, 255);
+
             if (IsSelected) {
-                var id = TileType == MapTileType.Ramp
+                var id = TileType == MapTileType.Slope
                     ? Orientation == Direction.N
                         ? 2
                         : 3

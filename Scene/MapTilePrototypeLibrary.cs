@@ -16,9 +16,13 @@ namespace isometric_1.Scene {
         public ImageTileSet TileSet { get; set; }
         public Size3d TileSize { get; set; }
 
+        public MapTilePrototype[] Tiles { get; set; }
         [XmlIgnore]
         public Dictionary<string, MapTilePrototype> HashedTiles { get; set; }
-        public MapTilePrototype[] Tiles { get; set; }
+
+        public Marker[] Markers { get; set; }
+        [XmlIgnore]
+        public Dictionary<string, Marker> HashedMarkers { get; set; }
 
         public static void Save (string path, MapTilePrototypeLibrary library) {
             var s = new XmlSerializer (typeof (MapTilePrototypeLibrary));
@@ -48,6 +52,12 @@ namespace isometric_1.Scene {
             foreach(var tile in library.Tiles) {
                 tile.Library = library;
                 library.HashedTiles.Add(tile.Name, tile);
+            }
+
+            library.HashedMarkers = new Dictionary<string, Marker>();
+
+            foreach(var marker in library.Markers) {
+                library.HashedMarkers.Add(marker.Type, marker);
             }
 
             return library;
