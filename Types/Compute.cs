@@ -2,6 +2,7 @@ namespace isometric_1.Types {
     using System;
 
     using isometric_1.Scene;
+    using SDL2;
 
     public static class Compute {
 

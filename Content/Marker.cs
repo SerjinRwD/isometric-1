@@ -1,7 +1,14 @@
-namespace isometric_1.Scene {
+namespace isometric_1.Content {
     using System.Xml.Serialization;
 
     using isometric_1.Types;
+
+    public enum MarkerProduct {
+        Actor,
+        Decoration,
+        Trigger
+
+    }
 
     public class Marker {
         

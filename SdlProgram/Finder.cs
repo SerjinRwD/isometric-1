@@ -55,7 +55,7 @@ namespace isometric_1.SdlProgram {
 
             SceneContext.Init(new Size2d (_width, _height), new Size2d(0, 0), null);
 
-            _font = SdlFont.LoadFromTTF (Resources.GetFilePath ("fonts", "DejaVuSansMono.ttf"), 9);
+            _font = SdlFont.LoadFromTTF (Data.GetFilePath ("fonts", "DejaVuSansMono.ttf"), 9);
 
             Console.WriteLine ($"MapSize: {SceneContext.Current.Map.MapSize}");
         }

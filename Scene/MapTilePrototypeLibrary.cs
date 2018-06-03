@@ -45,7 +45,7 @@ namespace isometric_1.Scene {
                 library = (MapTilePrototypeLibrary) s.Deserialize (ws);
             }
 
-            library.TileSet = ImageTileSet.Load(Resources.GetFilePath("tilesets", library.ImageTileSetFile), renderer);
+            library.TileSet = ImageTileSet.Load(Data.GetFilePath("tilesets", library.ImageTileSetFile), renderer);
             
             library.HashedTiles = new Dictionary<string, MapTilePrototype>();
 

@@ -1,7 +1,5 @@
-namespace isometric_1.Types
-{
-    public enum Direction
-    {
+namespace isometric_1.Types {
+    public enum Direction {
         E,
         NE,
         N,
@@ -11,4 +9,6 @@ namespace isometric_1.Types
         S,
         SE
     }
+
+
 }

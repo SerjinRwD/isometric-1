@@ -20,7 +20,7 @@ namespace isometric_1.Builders {
             var treesCount = ((mapSize.width * mapSize.height) / 100) * 10;
             int i, j, n;
 
-            GlobalLight = new Lighting (SdlColorFactory.FromRGB ("#ffffff"), 10);
+            GlobalLight = new Lighting (SdlColorFactory.FromRGBA (255, 255, 255, 10));
 
             for (i = 0; i < mapSize.width; i++) {
                 for (j = 0; j < mapSize.height; j++) {

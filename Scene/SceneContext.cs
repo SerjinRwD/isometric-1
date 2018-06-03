@@ -51,14 +51,14 @@ namespace isometric_1.Scene {
                     var d = new Decoration (m.MapPosition, SceneContext.Current.Map.TileSet.Tiles[m.ImageId]);
 
                     SceneContext.Current.Rendering.Add(d);
-                    SceneContext.Current.Map.LocalLights.Add(new Lighting(m.MapPosition, SdlColorFactory.FromRGB("#f5e7a7"), 255));
+                    SceneContext.Current.Map.LocalLights.Add(new Lighting(m.MapPosition, SdlColorFactory.FromRGBA(0xf5, 0xe7, 0xa7, 0xff)));
                 }
 
                 if (m.Type == "light-2") {
                     var d = new Decoration (m.MapPosition, SceneContext.Current.Map.TileSet.Tiles[m.ImageId]);
 
                     SceneContext.Current.Rendering.Add(d);
-                    SceneContext.Current.Map.LocalLights.Add(new Lighting(m.MapPosition, SdlColorFactory.FromRGB("#ff4747"), 255));
+                    SceneContext.Current.Map.LocalLights.Add(new Lighting(m.MapPosition, SdlColorFactory.FromRGBA(0xff, 0x47, 0x47, 0xff)));
                 }
 
                 if (m.Type == "tree-1") {

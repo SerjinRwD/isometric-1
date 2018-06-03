@@ -41,11 +41,5 @@ namespace isometric_1.Types {
 
             return sdlColor;
         }
-
-        /*
-        public (int, int, int) ToRGBTouple () {
-
-        }
-        */
     }
 }

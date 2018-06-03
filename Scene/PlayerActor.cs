@@ -2,6 +2,7 @@ namespace isometric_1.Scene {
     using System.Collections.Generic;
     using System;
 
+    using isometric_1.Content;
     using isometric_1.Types;
 
     public class PlayerActor : AbstractActor {
@@ -85,6 +86,6 @@ namespace isometric_1.Scene {
             }
         }
 
-        public PlayerActor (MapPoint mapPosition, ImageTile image) : base (mapPosition, image) { }
+        public PlayerActor (MapPoint mapPosition, Image image) : base (mapPosition, image) { }
     }
 }

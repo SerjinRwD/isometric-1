@@ -3,7 +3,7 @@ namespace isometric_1.Helpers {
     using System.Reflection;
     using System;
 
-    public static class Resources {
+    public static class Data {
         private static string _basePath;
 
         public static string BasePath {
@@ -17,7 +17,7 @@ namespace isometric_1.Helpers {
         }
 
         public static string GetFilePath (string catalog, string fileName) {
-            var path = Path.Combine (BasePath, "resources", catalog, fileName);
+            var path = Path.Combine (BasePath, "data", catalog, fileName);
 
             if (!File.Exists (path)) {
                 throw new FileNotFoundException (fileName);
@@ -27,7 +27,7 @@ namespace isometric_1.Helpers {
         }
 
         public static string GetCatalogPath (string catalog) {
-            var path = Path.Combine (BasePath, "resources", catalog);
+            var path = Path.Combine (BasePath, "data", catalog);
 
             if (!Directory.Exists (path)) {
                 throw new DirectoryNotFoundException (catalog);

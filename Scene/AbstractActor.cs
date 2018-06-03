@@ -1,4 +1,5 @@
 namespace isometric_1.Scene {
+    using isometric_1.Content;
     using isometric_1.Contract;
     using isometric_1.ManagedSdl;
     using isometric_1.Types;
@@ -10,7 +11,7 @@ namespace isometric_1.Scene {
     }
 
     public abstract class AbstractActor : AbstractSdlEventListener, IUpdateable, IRenderable {
-        public ImageTile Image { get; protected set; }
+        public Image Image { get; protected set; }
         public Point3d RegistrationPoint { get; protected set; }
         public Point3d IsometricPosition { get; protected set; }
 
@@ -35,16 +36,14 @@ namespace isometric_1.Scene {
                 return;
             }
 
-            var light = SceneContext.Current.Map.Tiles[MapPosition.column, MapPosition.row].Light;
-
-            Image.Texture.ColorMod = light.modulatedColor; // (light.intensity, light.intensity, light.intensity);
+            Image.Texture.ColorMod = SceneContext.Current.Map.Tiles[MapPosition.column, MapPosition.row].ModulatedColor;
 
             renderer.RenderTexture (
                 Image.Texture,
                 resultIsoX, resultIsoY,
                 Image.GetClipRect ());
 
-            Image.Texture.ColorMod = (255, 255, 255);
+            Image.Texture.ColorMod = SdlColorFactory.White;
         }
 
         public virtual void Update () {
@@ -57,7 +56,7 @@ namespace isometric_1.Scene {
             var tileSize = SceneContext.Current.Map.TileSize;
         }
 
-        public AbstractActor (MapPoint mapPosition, ImageTile image) {
+        public AbstractActor (MapPoint mapPosition, Image image) {
             MapPosition = mapPosition;
             Position = mapPosition.ToPoint3d (SceneContext.Current.Map.TileSize);
             Image = image;

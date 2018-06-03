@@ -20,10 +20,10 @@ namespace isometric_1.SdlProgram {
 
         public override void Run () {
 
-            var font = SdlFont.LoadFromTTF (Resources.GetFilePath (@"fonts", "DejaVuSansMono.ttf"), 12);
+            var font = SdlFont.LoadFromTTF (Data.GetFilePath (@"fonts", "DejaVuSansMono.ttf"), 12);
 
-            var tileset = ImageTileSet.Load (Resources.GetFilePath ("tilesets", "global.xml"), Renderer);
-            var library = MapTilePrototypeLibrary.Load (Resources.GetFilePath ("libraries", "demo.xml"), Renderer);
+            var tileset = ImageTileSet.Load (Data.GetFilePath ("tilesets", "global.xml"), Renderer);
+            var library = MapTilePrototypeLibrary.Load (Data.GetFilePath ("libraries", "demo.xml"), Renderer);
 
             SceneContext.Init (
                 new Size2d (128, 128), new Size2d (Window.Size.width, Window.Size.height), tileset, new Demo1MapBuilder (library)); // new PyramidMapBuilder (library)); // 

@@ -44,7 +44,22 @@ namespace isometric_1.Scene {
         public object Tag { get; set; }
 
         #region Освещенность
-        public MapTileLight Light { get; set; }
+
+        private SDL.SDL_Color _srcLight;
+        private SDL.SDL_Color _modulatedColor;
+
+        public SDL.SDL_Color SrcLight
+        { 
+            get => _srcLight;
+            set {
+                _srcLight = value;
+                _modulatedColor = SdlColorFactory.ApplyAlphaToColor(value);
+            }
+        }
+        public SDL.SDL_Color ModulatedColor { 
+            get => _modulatedColor;
+        
+        }
         #endregion
 
         private MapTile () {
@@ -207,7 +222,7 @@ namespace isometric_1.Scene {
 
             var texture = tileSet.Texture;
 
-            texture.ColorMod = Light.modulatedColor; // (Light.intensity, Light.intensity, Light.intensity);(255, 0, 0); // 
+            texture.ColorMod = ModulatedColor;
 
             if (WallSouth != null && MapCoords.level > 0) {
                 for (var i = 0; i < MapCoords.level; i++) {
@@ -288,7 +303,7 @@ namespace isometric_1.Scene {
                 SceneContext.Current.TileSet.Texture.AlphaMod = 255;
             }
 
-            texture.ColorMod = (255, 255, 255);
+            texture.ColorMod = SdlColorFactory.White;
 
             if (IsSelected) {
                 var id = TileType == MapTileType.Slope

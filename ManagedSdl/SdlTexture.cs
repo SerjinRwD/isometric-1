@@ -21,7 +21,7 @@ namespace isometric_1.ManagedSdl {
             set => SDL.SDL_SetTextureAlphaMod(Pointer, value);
         }
 
-        public (byte, byte, byte) ColorMod
+        public SDL.SDL_Color ColorMod
         {
             get
             {
@@ -31,10 +31,10 @@ namespace isometric_1.ManagedSdl {
                     throw new SdlException(nameof(ColorMod));
                 }
 
-                return (r, g, b);
+                return SdlColorFactory.FromRGB(r, g, b);
             }
 
-            set => SDL.SDL_SetTextureColorMod(Pointer, value.Item1, value.Item2, value.Item3);
+            set => SDL.SDL_SetTextureColorMod(Pointer, value.r, value.g, value.b);
         }
 
         public SDL.SDL_BlendMode BlendMode

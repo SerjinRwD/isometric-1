@@ -1,18 +1,20 @@
-namespace isometric_1.Scene {
+namespace isometric_1.Content {
     using System.Xml.Serialization;
 
     using isometric_1.ManagedSdl;
 
     using SDL2;
 
-    public class ImageTile {
-        public const int NOT_SET = -1;
+    public class Image {
 
         [XmlIgnore]
         public SdlTexture Texture { get; set; }
 
         [XmlAttribute]
-        public int OrderId { get; set; }
+        public string Name { get; set; }
+        
+        [XmlAttribute]
+        public string BitmapFile { get; set; }
 
         [XmlAttribute]
         public int OffsetX { get; set; }
@@ -48,7 +50,8 @@ namespace isometric_1.Scene {
 
             return rect;
         }
-        public static int Comparison (ImageTile x, ImageTile y) {
+        
+        public static int Comparison (Image x, Image y) {
             if (x == null && y == null) {
                 return 0;
             }
@@ -61,7 +64,7 @@ namespace isometric_1.Scene {
                 return -1;
             }
 
-            return x.OrderId.CompareTo (y.OrderId);
+            return x.Name.CompareTo (y.Name);
         }
     }
 }

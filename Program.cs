@@ -2,6 +2,7 @@
     using System;
 
     using isometric_1.Builders;
+    using isometric_1.Content;
     using isometric_1.Helpers;
     using isometric_1.ManagedSdl;
     using isometric_1.Scene;
@@ -42,12 +43,12 @@
                 Name = "templateName",
                 Description = "templateDescription",
                 BitmapFile = "path/to/your/bitmap",
-                Tiles = new ImageTile[] {
-                new ImageTile ()
+                Tiles = new Image[] {
+                new Image ()
                 }
             };
 
-            var outputPath = System.IO.Path.Combine (Resources.GetCatalogPath ("tilesets"), "template.xml");
+            var outputPath = System.IO.Path.Combine (Data.GetCatalogPath ("tilesets"), "template.xml");
             tileset.Save (outputPath);
 
             return outputPath;
@@ -64,16 +65,16 @@
                         Type = MapTileType.Floor,
                         Orientation = Direction.N,
                         FloorId = 0,
-                        WallSouthId = ImageTile.NOT_SET,
-                        WallNorthId = ImageTile.NOT_SET,
+                        WallSouthId = Image.NOT_SET,
+                        WallNorthId = Image.NOT_SET,
                     },
                     new MapTilePrototype {
                         Name = "prototype2",
                         Type = MapTileType.Wall,
                         Orientation = Direction.N,
-                        FloorId = ImageTile.NOT_SET,
+                        FloorId = Image.NOT_SET,
                         WallSouthId = 1,
-                        WallNorthId = ImageTile.NOT_SET,
+                        WallNorthId = Image.NOT_SET,
                     }
                 },
                 Markers = new Marker[] {
@@ -84,7 +85,7 @@
                 }
             };
 
-            var outputPath = System.IO.Path.Combine (Resources.GetCatalogPath ("libraries"), "template.xml");
+            var outputPath = System.IO.Path.Combine (Data.GetCatalogPath ("libraries"), "template.xml");
             library.Save (outputPath);
 
             return outputPath;

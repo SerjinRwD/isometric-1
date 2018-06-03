@@ -15,7 +15,6 @@ namespace isometric_1.Scene {
         public Size3d TileSize { get; private set; }
         public ImageTileSet TileSet { get; private set; }
         public MapTile[, ] Tiles { get; private set; }
-        public Dictionary<Point2d, MapTile> Hash { get; private set; }
         public List<Marker> Markers { get; private set; }
         public Lighting GlobalLight { get; private set; }
         public List<Lighting> LocalLights { get; private set; }
@@ -42,7 +41,6 @@ namespace isometric_1.Scene {
         public Map (Size2d mapSize) {
             MapSize = mapSize;
 
-            Hash = new Dictionary<Point2d, MapTile> ();
             Tiles = new MapTile[MapSize.width, MapSize.height];
 
             BypassTiles ((i, j) => {
@@ -72,39 +70,12 @@ namespace isometric_1.Scene {
         }
 
         public void Init () {
-            /*
-            BypassTiles ((i, j) => {
-                var cell = Tiles[i, j];
-                var key = cell.IsometricPosition.ToPoint2d ();
-
-                if (Hash.ContainsKey (key)) {
-                    Hash[key] = cell;
-                } else {
-                    Hash.Add (key, cell);
-                    //Console.WriteLine ($"hash: {key}");
-                }
-            });
-            */
-
             BypassTiles ((i, j) => {
                 Tiles[i, j].RecalculateNeighbors ();
             });
         }
 
         public MapTile TileAtScreenPos (Point2d screenPos) {
-            /*
-            var isoTileX = screenPos.x / _precalculatedCellWidthHalf * _precalculatedCellWidthHalf;
-            var isoTileY = screenPos.y / _precalculatedCellLengthHalf * _precalculatedCellLengthHalf + (isoTileX % 2 == 0 ? 0 : _precalculatedCellLengthQuarter);
-
-            var currentIsoTile = new Point2d (
-                isoTileX,
-                isoTileY);
-
-            //Console.WriteLine ($"screenPos: {screenPos}, currentIsoTile: {currentIsoTile}, match: {Hash.ContainsKey (currentIsoTile)}");
-
-            return Hash.ContainsKey (currentIsoTile) ? Hash[currentIsoTile] : null;
-            */
-
             var mapX = ((screenPos.y / (TileSize.length >> 2)) + (screenPos.x / (TileSize.width >> 1))) >> 1;
             var mapY = ((screenPos.y / (TileSize.length >> 2)) - (screenPos.x / (TileSize.width >> 1))) >> 1;
 
@@ -120,16 +91,16 @@ namespace isometric_1.Scene {
             BypassTiles ((i, j) => {
                 var t = Tiles[i, j];
 
-                t.Light = GlobalLight.ToMapTileLight ();
+                t.SrcLight = GlobalLight.color;
 
                 foreach (var l in LocalLights) {
 
                     var result = ObstacleFinder.Check (this, Tiles[l.mapPosition.column, l.mapPosition.row], t);
 
                     if (result.IsGoalAchieved) {
-                        var intensity = (byte)(l.intensity / (Compute.EuclideanDistance (new MapPoint (i, j), l.mapPosition) + 1));
+                        var intensity = (byte)(l.color.a / (Compute.EuclideanDistance (new MapPoint (i, j), l.mapPosition) + 1));
 
-                        t.Light = t.Light.Blend(l.color, intensity); // new MapTileLight (l.color /*t.Light.color*/, (byte) Math.Min (255, (t.Light.intensity + intensity))); // * (255 - t.light)));
+                        t.SrcLight = SdlColorFactory.Blend(t.SrcLight, SdlColorFactory.FromRGBA(l.color.r, l.color.g, l.color.g, intensity));
                     }
                 }
             });
